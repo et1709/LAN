@@ -20,8 +20,7 @@ int connect_server(void)
 //用TCP连接服务器
 int tcp_connect(struct sockaddr_in* pSvr_addr)
 {
-	             
-	
+	//测试的
 }
 
 
