@@ -4,27 +4,32 @@ int connect_server(void)
 {     
 	int rt;
     struct sockaddr_in svr_addr;
-	//1:ç”¨UDPæŸ¥æ‰¾æœåŠ¡å™¨
+	//1:ÓÃUDP²éÕÒ·şÎñÆ÷
 	rt = udp_broadcast(&svr_addr);
 	if(-1 == rt)
 	{
 		return -1;
 	}
 	
-	//2,ç”¨TCPè¿æ¥æœåŠ¡å™¨
+	//2,ÓÃTCPÁ¬½Ó·şÎñÆ÷
 	tcp_connect(&svr_addr);
 	
 	return 0;
 }
 
-//ç”¨TCPè¿æ¥æœåŠ¡å™¨
+//ÓÃTCPÁ¬½Ó·şÎñÆ÷
 int tcp_connect(struct sockaddr_in* pSvr_addr)
 {
-	//æµ‹è¯•çš„
+
+
+
+
+
+	
 }
 
 
-//ç”¨UDPæŸ¥æ‰¾æœåŠ¡å™¨
+//ÓÃUDP²éÕÒ·şÎñÆ÷
 int udp_broadcast(struct sockaddr_in* pSvr_addr)
 {
     int udp_socket;
@@ -37,69 +42,69 @@ int udp_broadcast(struct sockaddr_in* pSvr_addr)
 	int svr_len = sizeof(struct sockaddr_in);
 	char recv_buf[128];
 	
-	//1.åˆ›å»ºUDPå¥—æ¥å­—
+	//1.´´½¨UDPÌ×½Ó×Ö
     udp_socket = socket(AF_INET, SOCK_DGRAM, 0)
     if(-1 == udp_socket)
     {
-        perror("åˆ›å»ºUDPå¥—æ¥å­—å¤±è´¥!");
+        perror("´´½¨UDPÌ×½Ó×ÖÊ§°Ü!");
         return -1;
     }
     
-	//2,è®¾ç½®å¹¿æ’­é€‰é¡¹ï¼Œåœ°å€å¯é‡ç”¨
+	//2,ÉèÖÃ¹ã²¥Ñ¡Ïî£¬µØÖ·¿ÉÖØÓÃ
     if(-1 == setsockopt(udp_socket, SOL_SOCKET, SO_REUSEADDR, 
         &reuse, sizeof(reuse)))
     {
-        perror("è®¾ç½®åœ°å€å¯é‡ç”¨å¤±è´¥!");
+        perror("ÉèÖÃµØÖ·¿ÉÖØÓÃÊ§°Ü!");
         close(udp_socket);
         return -1;
     }
        
-	//3,è®¾ç½®æ¥å¹¿æ’­åœ°å€
+	//3,ÉèÖÃ½Ó¹ã²¥µØÖ·
     bcast_addr.sin_family = AF_INET;
     bcast_addr.sin_addr.s_addr = inet_addr(BCAST);
     bcast_addr.sin_port = htonl(SER_PORT);
     
-    //å¾ªç¯ä¸åœçš„å‘å¹¿æ’­
+    //Ñ­»·²»Í£µÄ·¢¹ã²¥
     while(1)
     {
-        //4,å‘é€å¹¿æ’­æ¶ˆæ¯
+        //4,·¢ËÍ¹ã²¥ÏûÏ¢
         if(-1 == sendto(udp_socket, CLT_TOKEN, strlen(CLT_TOKEN),
             0, (struct sockaddr *)&bcast_addr, bcast_addr_len))
         {
-            perror("å‘é€å¹¿æ’­å¤±è´¥!");
+            perror("·¢ËÍ¹ã²¥Ê§°Ü!");
 			close(udp_socket);
         	return -1;
         }
-	    //selectç›‘å¬æ˜¯å¦æœ‰æ¶ˆæ¯å¯è¯»
+	    //select¼àÌıÊÇ·ñÓĞÏûÏ¢¿É¶Á
 	    FD_ZERO(&rset);
 		FD_SET(udp_socket, &rset);
 		while( (-1 == (ret = select(udp_socket+1, &rset,
 				NULL, NULL, &timevalue))) && (EINTR == errno) );
 		if(-1 == ret)
 		{
-			perror("ç›‘æµ‹å¯è¯»æ¶ˆæ¯å¤±è´¥!");
+			perror("¼à²â¿É¶ÁÏûÏ¢Ê§°Ü!");
 			continue;
 		}
 		else if(0 == ret)
 		{
-			printf("æœåŠ¡å™¨æœªæ‰¾åˆ°, è¯·ç¨å...\n");
+			printf("·şÎñÆ÷Î´ÕÒµ½, ÇëÉÔºó...\n");
 			continue;
 		}
 		
-	    //5,æ¥æ”¶å›åº”æ¶ˆæ¯
+	    //5,½ÓÊÕ»ØÓ¦ÏûÏ¢
 		memset(pSvr_addr, 0, svr_len);
 		memset(recv_buf, 0, sizeof(recv_buf));
 		if(-1 == recvfrom(udp_socket, recv_buf, sizeof(recv_buf), 0,
 			(struct sockaddr *)pSvr_addr, &svr_len))
 		{
-			perror("UDPæ¥æ”¶æœåŠ¡å™¨å›åº”å¤±è´¥");
+			perror("UDP½ÓÊÕ·şÎñÆ÷»ØÓ¦Ê§°Ü");
 		}
 		else
 		{
-			//6,æ¥æ”¶åˆ°æ¶ˆæ¯,éªŒè¯æ˜¯ä¸æ˜¯æœåŠ¡å™¨,æ˜¯å°±é€€å‡ºå¾ªç¯
+			//6,½ÓÊÕµ½ÏûÏ¢,ÑéÖ¤ÊÇ²»ÊÇ·şÎñÆ÷,ÊÇ¾ÍÍË³öÑ­»·
 			if(0 == strcmp(SVR_TOKEN, recv_buf))
 			{
-				printf("å·²æ‰¾åˆ°æœåŠ¡å™¨ %s(%d)\n",
+				printf("ÒÑÕÒµ½·şÎñÆ÷ %s(%d)\n",
 					inet_ntoa(pSvr_addr.sin_addr), 
 					ntohs(pSvr_addr.sin_port));
 			}
@@ -107,7 +112,7 @@ int udp_broadcast(struct sockaddr_in* pSvr_addr)
 		}       
     }
 
-	//7,å…³é—­å¥—æ¥å­—
+	//7,¹Ø±ÕÌ×½Ó×Ö
 	close(udp_socket);
 	
 	return 0;
