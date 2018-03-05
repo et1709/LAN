@@ -4,13 +4,20 @@
 #include<stdio.h>
 #include <sys/types.h>          /* See NOTES */
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/time.h>	 
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
+#include <arpa/inet.h>
 
 
 
-#define SER_PORT 8080
-#define BCAST "192.168.199.255"
-#define SVR_TOKEN  "我是服务器"
-#define CLT_TOKEN  "我是客户端"
+#define SVR_TOKEN  "Hello client"
+#define CLT_TOKEN  "Hello server"
+
+int connect_server(char *, unsigned short );
+int udp_broadcast(struct sockaddr_in* , char *, unsigned short );
 
 
 

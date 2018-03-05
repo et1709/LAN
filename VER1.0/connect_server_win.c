@@ -1,40 +1,45 @@
 #include"connect_server.h"
 
-int connect_server(void)
+int connect_server(char *ip, unsigned short port)
 {     
-	int rt;
+	int rt;	
     struct sockaddr_in svr_addr;
 	//1:用UDP查找服务器
-	rt = udp_broadcast(&svr_addr);
+	rt = udp_broadcast(&svr_addr, ip, port);
 	if(-1 == rt)
 	{
 		return -1;
 	}
 	
 	//2,用TCP连接服务器
-	tcp_connect(&svr_addr);
+	//tcp_connect(&svr_addr);
 	
 	return 0;
 }
 
 //用TCP连接服务器
-int tcp_connect(struct sockaddr_in* pSvr_addr)
-{
-
+//int tcp_connect(struct sockaddr_in* pSvr_addr)
+//{
+	
 
 
 
 
 	
-}
-
+//}
 
 //用UDP查找服务器
-int udp_broadcast(struct sockaddr_in* pSvr_addr)
+int udp_broadcast(struct sockaddr_in* pSvr_addr, char *ip, unsigned short port)
 {
     int udp_socket;
     int reuse = 1;
 	fd_set rset;
+	char *bcast_ip = ip;
+	unsigned short bcast_port = port;
+	
+	printf("bcast_ip = %s\n", bcast_ip);
+	printf("bcast_port = %d\n", bcast_port);
+	
 	struct timeval timevalue = {2, 0};
 	int ret;
     struct sockaddr_in bcast_addr;
@@ -43,15 +48,15 @@ int udp_broadcast(struct sockaddr_in* pSvr_addr)
 	char recv_buf[128];
 	
 	//1.创建UDP套接字
-    udp_socket = socket(AF_INET, SOCK_DGRAM, 0)
+    udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
     if(-1 == udp_socket)
     {
         perror("创建UDP套接字失败!");
         return -1;
     }
     
-	//2,设置广播选项，地址可重用
-    if(-1 == setsockopt(udp_socket, SOL_SOCKET, SO_REUSEADDR, 
+	//2,设置广播选项
+    if(-1 == setsockopt(udp_socket, SOL_SOCKET, SO_BROADCAST, 
         &reuse, sizeof(reuse)))
     {
         perror("设置地址可重用失败!");
@@ -61,8 +66,8 @@ int udp_broadcast(struct sockaddr_in* pSvr_addr)
        
 	//3,设置接广播地址
     bcast_addr.sin_family = AF_INET;
-    bcast_addr.sin_addr.s_addr = inet_addr(BCAST);
-    bcast_addr.sin_port = htonl(SER_PORT);
+    bcast_addr.sin_addr.s_addr = inet_addr(bcast_ip);
+    bcast_addr.sin_port = htons(bcast_port);
     
     //循环不停的发广播
     while(1)
@@ -105,8 +110,8 @@ int udp_broadcast(struct sockaddr_in* pSvr_addr)
 			if(0 == strcmp(SVR_TOKEN, recv_buf))
 			{
 				printf("已找到服务器 %s(%d)\n",
-					inet_ntoa(pSvr_addr.sin_addr), 
-					ntohs(pSvr_addr.sin_port));
+					inet_ntoa(pSvr_addr->sin_addr),
+					ntohs(pSvr_addr->sin_port));
 			}
 			break;
 		}       
