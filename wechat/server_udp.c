@@ -30,7 +30,7 @@ int udp_server_init()
 			ntohs(udp_cltaddr.sin_port), buf_r);
 			
 	//判断消息后应答
-	if(strcmp(buf_r, "Hello server"))
+	if(0 == strcmp(buf_r, "Hello server"))
 	{
 		uin_sendto(udp_socket, buf_w, strlen(buf_w), &udp_cltaddr);
 	}	

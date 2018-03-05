@@ -2,16 +2,18 @@
 
 struct info infos[MAXBACKLOG];
 
+
 int main()
 {	
 	struct TcpInit tcp_init;
 	
-	udp_server_init();//UDP 服务器初始化
-	
 	tcp_server_init(&tcp_init);
-
 	while(1)
 	{
+		udp_server_init();//UDP 服务器初始化
+	
+
+
 		int index;
 		
 		//等待客户端连接
