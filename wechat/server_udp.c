@@ -17,7 +17,13 @@ int udp_server_init()
 		printf("创建UDP套接字失败\n");
 		return -1;
 	}
+	else
+	{
+		printf("Socket successful!\n");
+		printf("Bind successful!\n");
+	}
 	
+	printf("Listening......\n");
 	//接收客户端数据
 	uin_recvfrom(udp_socket, buf_r, sizeof buf_r, &udp_cltaddr);
 	printf("收到%s(%d)的消息：%s\n", inet_ntoa(udp_cltaddr.sin_addr),

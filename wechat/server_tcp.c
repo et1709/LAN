@@ -13,6 +13,10 @@ int tcp_server_init(struct TcpInit *tcp_init)
 		printf("创建套接字失败\n");
 		return -1;
 	}
+	else
+	{
+		printf("Accept successful!\n");
+	}
 	
 	return 0;
 }
@@ -24,7 +28,7 @@ void *tcp_server_handle(void *arg)
 	char *cltip = NULL;           //建立客户端端 IP
 	in_port_t cltport;            //建立客户端端口号
 	char buf_r[128] = "";
-	char buf_w[128] = "长江长江我是黄河";
+	char buf_w[128] = "—————————————————— Welecom come char ———————————————————————";
 	int connect_status;
 	int index = (int)arg;
 	int connfd = infos[index].tcp_connfd;
@@ -49,7 +53,7 @@ void *tcp_server_handle(void *arg)
 		}
 		else
 		{
-			printf("收到客户端%s(%d)的消息：%s\n", cltip, cltport, buf_r);
+			printf("\n已连接客户端%s(%d)\n", cltip, cltport);
 			if(strcmp(buf_r, "over") == 0)
 			{
 				printf("通信结束\n");
