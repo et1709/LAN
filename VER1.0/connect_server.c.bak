@@ -67,7 +67,7 @@ int udp_broadcast(struct sockaddr_in* pSvr_addr, char *ip, unsigned short port)
 	//3,设置接广播地址
     bcast_addr.sin_family = AF_INET;
     bcast_addr.sin_addr.s_addr = inet_addr(bcast_ip);
-    bcast_addr.sin_port = htonl(bcast_port);
+    bcast_addr.sin_port = htons(bcast_port);
     
     //循环不停的发广播
     while(1)

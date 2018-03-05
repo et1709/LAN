@@ -6,12 +6,10 @@ int main()
 {	
 	struct TcpInit tcp_init;
 	
-	udp_server_init();             //UDP 服务器初始化
-	if(tcp_server_init(&tcp_init) == 0)
-	{
-		printf("TCP 服务器初始化成功\n");
-	}
+	udp_server_init();//UDP 服务器初始化
 	
+	tcp_server_init(&tcp_init);
+
 	while(1)
 	{
 		int index;

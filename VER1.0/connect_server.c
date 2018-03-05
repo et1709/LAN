@@ -10,23 +10,80 @@ int connect_server(char *ip, unsigned short port)
 	{
 		return -1;
 	}
-	
+
 	//2,用TCP连接服务器
-	//tcp_connect(&svr_addr);
+	tcp_connect(&svr_addr);
 	
 	return 0;
 }
 
 //用TCP连接服务器
-//int tcp_connect(struct sockaddr_in* pSvr_addr)
-//{
+int tcp_connect(struct sockaddr_in* pSvr_addr)
+{
+	int tcp_sockfd;
+	int cnt;
+	char recv_buf[128];
+	int recv_buf_len = sizeof(recv_buf);
+	struct sockaddr_in svr_addr = *pSvr_addr;
+	int svr_addr_len = sizeof(struct sockaddr_in);
+	// 1. 创建TCP套接字
+	tcp_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if(-1 == tcp_sockfd)
+	{
+		perror("创建TCP套接字失败!");
+		return -1;
+	}
+
+	// 2. 发起连接
+	if(-1 == connect(tcp_sockfd, (struct sockaddr *)&svr_addr, 
+		svr_addr_len))
+	{
+		perror("TCP连接服务器失败!");
+		goto out;
+	}
+
+	while(1)
+	{
+		while((-1 == (cnt = send(tcp_sockfd, CLT_TOKEN, sizeof(CLT_TOKEN), 0))) 
+			   && (EINTR == errno));
+		if(-1 == cnt)
+		{
+			perror("TCP发送消息到服务器失败!");
+			sleep(1);
+			continue;
+		}
+		else if(cnt > 0)
+		{
+			printf("TCP成功发送消息%s到服务器\n", CLT_TOKEN);
+			break;
+		}
+	}
+
+	memset(recv_buf, 0, recv_buf_len);
+	while(1)
+	{	
+		while( (-1 == (cnt = recv(tcp_sockfd, recv_buf, recv_buf_len, 0))) 
+				&& (EINTR == errno));
+		if(-1 == cnt)
+		{
+			perror("TCP接收服务器消息失败!");
+			
+		}
+		else if(cnt > 0)
+		{
+			printf("接收到服务器消息:%s\n", recv_buf);
+			printf("成功连接上服务器 %s(%d)\n",
+					inet_ntoa(svr_addr.sin_addr),
+					ntohs(svr_addr.sin_port));
+			break;
+		}		
+	}
+
+out:
+	close(tcp_sockfd);
+	return -1;
 	
-
-
-
-
-	
-//}
+}
 
 //用UDP查找服务器
 int udp_broadcast(struct sockaddr_in* pSvr_addr, char *ip, unsigned short port)
@@ -88,11 +145,13 @@ int udp_broadcast(struct sockaddr_in* pSvr_addr, char *ip, unsigned short port)
 		if(-1 == ret)
 		{
 			perror("监测可读消息失败!");
+			sleep(2);
 			continue;
 		}
 		else if(0 == ret)
 		{
 			printf("服务器未找到, 请稍后...\n");
+			sleep(2);
 			continue;
 		}
 		

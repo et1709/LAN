@@ -8,7 +8,8 @@
 #include <sys/time.h>	 
 #include <unistd.h>
 #include <string.h>
-#include <error.h>
+#include <errno.h>
+
 
 
 #define SVR_TOKEN  "Hello client"
