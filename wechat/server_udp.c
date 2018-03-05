@@ -19,8 +19,8 @@ int udp_server_init()
 	}
 	else
 	{
-		printf("Socket successful!\n");
-		printf("Bind successful!\n");
+		printf("Socket success!\n");
+		printf("Bind success!\n");
 	}
 	
 	printf("Listening......\n");
@@ -30,7 +30,7 @@ int udp_server_init()
 			ntohs(udp_cltaddr.sin_port), buf_r);
 			
 	//判断消息后应答
-	if(0 == strcmp(buf_r, "Hello server"))
+	if(strcmp(buf_r, "Hello server") == 0)
 	{
 		uin_sendto(udp_socket, buf_w, strlen(buf_w), &udp_cltaddr);
 	}	

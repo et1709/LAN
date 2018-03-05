@@ -28,7 +28,7 @@ void *tcp_server_handle(void *arg)
 	char *cltip = NULL;           //建立客户端端 IP
 	in_port_t cltport;            //建立客户端端口号
 	char buf_r[128] = "";
-	char buf_w[128] = "—————————————————— Welecom come char ———————————————————————";
+	char buf_w[128] = "—————————————————— Welcome to WeChat ———————————————————————";
 	int connect_status;
 	int index = (int)arg;
 	int connfd = infos[index].tcp_connfd;

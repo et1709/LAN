@@ -10,12 +10,14 @@
 #include <unistd.h>
 #include <errno.h>
 #include <pthread.h>
+#include <sys/shm.h>
 
 #include "uinsock.h"
 
 /************宏定义************/
-#define SOCKET_PORT 8080
-#define MAXBACKLOG  50
+#define SOCKET_PORT 8080 //端口号
+#define MAXBACKLOG  50   //最大连接数量
+#define SIZE_SHMADD 2048 //共享内存的大小
 
 /************结构体声明************/
 struct info
@@ -40,5 +42,6 @@ void *tcp_server_handle(void *arg);
 int tcp_server_close(struct TcpInit *tcp_init);
 int get_first();
 extern struct info infos[MAXBACKLOG];
+int shmid_create();
 
 #endif
