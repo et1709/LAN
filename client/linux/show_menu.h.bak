@@ -1,0 +1,12 @@
+﻿#ifndef _SHOW_MENU_H_
+#define _SHOW_MENU_H_
+
+/*
+*显示登陆，注册界面
+*/
+void login_menu(void);
+void main_menu(void);
+
+
+#endif
+
