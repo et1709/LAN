@@ -80,8 +80,8 @@ int tcp_connect(struct sockaddr_in* pSvr_addr)
 		}
 		else if(cnt > 0)
 		{
-			printf("接收到服务器消息:%s\n", recv_buf);
-			printf("成功连接上服务器 %s(%d)\n",
+			printf("接收到TCP服务器消息:%s\n", recv_buf);
+			printf("TCP成功连接上服务器 %s(%d)\n",
 					inet_ntoa(svr_addr.sin_addr),
 					ntohs(svr_addr.sin_port));
 			break;

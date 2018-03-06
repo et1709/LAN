@@ -37,13 +37,13 @@ int main()
 		infos[index].tcp_cltaddr = tcp_init.tcp_cltaddr;
 		
 		//将新上线的客户发送给在线的客户端
-		memset(buf_w, 0 ,sizeof buf_w);//清空缓冲区
-		sprintf(buf_w, "%s(%d)", inet_ntoa(infos[index].tcp_cltaddr.sin_addr)
-									,ntohs(infos[index].tcp_cltaddr.sin_port));
-		strcat(buf_w, " 已上线...\n");
-		for(index = 0; index < MAXBACKLOG; index++)
+		//memset(buf_w, 0 ,sizeof buf_w);//清空缓冲区
+		//sprintf(buf_w, "%s(%d)", inet_ntoa(infos[index].tcp_cltaddr.sin_addr)
+		//							,ntohs(infos[index].tcp_cltaddr.sin_port));
+		//strcat(buf_w, " 已上线...\n");
+		//for(index = 0; index < MAXBACKLOG; index++)
 		{
-			send(tcp_init.tcp_connfd, buf_w, strlen(buf_w), 0);
+		//	send(tcp_init.tcp_connfd, buf_w, strlen(buf_w), 0);
 		}
 		
 		//创建线程

@@ -13,48 +13,11 @@ int main(void)
 	{
 		return -1;
 	}
-
-	//2,显示注册登陆菜单
-	login_menu();
-
+	
 	//3, 功能选择
-	choose_function();
-}
-
-//功能选择
-void choose_function(void)
-{
-	int num;
-	while(1)
-	{		
-		while(scanf(&num) <= 0)
-		{
-			printf("输入错误, 请重新输入!\n");
-		}
-		if(num > 3 || num < 0)
-		{
-			printf("抱歉,没有这个选项, 请重新输入!\n");
-		}
-		else {
-			break;
-		}
-	}
-	switch(num)
-	{
-		case 0: 
-			printf("感谢使用, 88~~\n");
-			break;
-		case 1:
-			//注册账号
-			
-			break;
-		case 1:
-			//登陆
-			
-			break;
-	}
-
-
+	function();
 	
 }
+
+
 

@@ -1,8 +1,13 @@
 ﻿#include"connect_server.h"
 
+/*
+*功能:    先用UDP查找服务器,再用TCP连接服务器
+*返回值:  成功返回TCP连接套接字,失败返回-1
+*/
 int connect_server(char *ip, unsigned short port)
 {     
 	int rt;	
+	int tcp_sockfd;
     struct sockaddr_in svr_addr;
 	//1:用UDP查找服务器
 	rt = udp_broadcast(&svr_addr, ip, port);
@@ -12,12 +17,16 @@ int connect_server(char *ip, unsigned short port)
 	}
 
 	//2,用TCP连接服务器
-	tcp_connect(&svr_addr);
+	tcp_sockfd = tcp_connect(&svr_addr);
+	if(-1 == tcp_sockfd)
+	{
+		return -1;
+	}
 	
-	return 0;
+	return tcp_sockfd;
 }
 
-//用TCP连接服务器
+//用TCP连接服务器,成功返回连接描述符，失败返回-1
 int tcp_connect(struct sockaddr_in* pSvr_addr)
 {
 	int tcp_sockfd;
@@ -79,6 +88,8 @@ int tcp_connect(struct sockaddr_in* pSvr_addr)
 		}		
 	}
 
+	return tcp_sockfd;
+	
 out:
 	close(tcp_sockfd);
 	return -1;
