@@ -11,8 +11,10 @@
 #include <errno.h>
 #include <pthread.h>
 #include <sys/shm.h>
+#include <stdlib.h>
 
 #include "uinsock.h"
+#include "protocol.h"
 
 /************宏定义************/
 #define SOCKET_PORT 8080 //端口号
@@ -25,6 +27,7 @@ struct info
 	int tcp_connfd;                 //连接描述符
 	struct sockaddr_in tcp_cltaddr; //客户端套接字地址
 	pthread_t thread;               //线程号
+	AGREEMENT dataPacket;           //数据包
 };
 
 struct TcpInit
@@ -35,13 +38,34 @@ struct TcpInit
 	in_port_t port;                 //设定端口号
 };
 
+struct ClientInfo
+{
+	struct sockaddr_in tcp_cltaddr; //客户端套接字地址
+	int id;
+	char nickname[20];
+};
+
 /************函数声明************/
+//**********UDP**********
 int udp_server_init();
+//**********TCP**********
 int tcp_server_init(struct TcpInit *tcp_init);
-void *tcp_server_handle(void *arg);
 int tcp_server_close(struct TcpInit *tcp_init);
+//**********线程**********
+void *tcp_server_handle(void *arg);
+void *receive_msg(void *arg);
+void *send_msg(void *arg);
 int get_first();
+//**********Handle_request**********
+struct sockaddr_in handle_request(AGREEMENT *packet, int index);
+void login_req(AGREEMENT *packet, int index);
+struct sockaddr_in singleChat_req(AGREEMENT *packet);
+
+/************外部变量声明************/
 extern struct info infos[MAXBACKLOG];
-int shmid_create();
+extern struct ClientInfo cliInfos[MAXBACKLOG]; //已登录的客户信息
+extern pthread_mutex_t mutex;  //互斥锁;
+extern int cliNum;             //客户端数
+
 
 #endif
