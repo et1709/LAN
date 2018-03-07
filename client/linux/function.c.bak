@@ -25,10 +25,11 @@ void function(int sockfd)
 	while (-1 == (rt = log_in()));
 
 	//显示主菜单
-	main_menu();
-	choose_function();
-
-	
+	while(1)
+	{
+		main_menu();
+		choose_function();
+	}	
 }
 
 /*处理接收消息函数:

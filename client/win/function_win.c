@@ -163,8 +163,21 @@ void *receive(void *arg)
 		}
 		else if(cnt > 0)
 		{
-			printf("接收到服务器消息(回应命令%d): %s\n", recv_data.order,
-				recv_data.information);
+			
+			//测试用
+			{
+				printf("接收到服务器消息(回应命令%d): %s\n", recv_data.order,
+						recv_data.information);
+				cnt = recv(parameter->sockfd, &recv_data, recv_data_len, 0);
+				if(-1 == cnt)
+				{
+					printf("转发服务器消息失败!\n");
+				}
+				else if(cnt > 0)
+				{
+					printf("转发服务器消息 (%s) 成功!\n", recv_data.information);
+				}				
+			}
 			
 			//消息入队
 			if(false == enqueue(receive_queue, recv_data))
