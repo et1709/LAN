@@ -109,13 +109,14 @@ void *_send(void * arg)
 	{
 		if(pSend_queue->front != pSend_queue->rear)
 		{			
+			
 			// 清空描述符集
 			FD_ZERO(&wset);
 
 			// 设置描述符到描述符集
 			FD_SET(sockfd, &wset);
 			
-			//检测是否有消息可读
+			//检测是否有消息可写
 			while( (-1 == (cnt = select(sockfd+1, NULL, &wset,
 					NULL, &timevalue))) && (EINTR == errno));
 			if(-1 == cnt)
@@ -126,14 +127,14 @@ void *_send(void * arg)
 			}
 
 			memset(&send_data, 0, send_data_len);
-
+			
 			//消息出队
 			if(false == dequeue(pSend_queue, &send_data))
 			{
 				printf("消息出队失败!");
 				continue;
 			}		
-			cnt = recv(sockfd, &send_data, send_data_len, 0);
+			cnt = send(sockfd, &send_data, send_data_len, 0);
 			if(-1 == cnt)
 			{
 				printf("发送消息失败!\n");

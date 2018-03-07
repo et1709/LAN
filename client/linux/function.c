@@ -1,4 +1,4 @@
-#include"function.h"
+ï»¿#include"function.h"
 
 INFORMATION_QUEUE* pSend_queue;
 INFORMATION_QUEUE* receive_queue;
@@ -6,7 +6,7 @@ INFORMATION_QUEUE* receive_queue;
 extern int udp_socket;
 
 
-//¹¦ÄÜÑ¡Ôñ
+//åŠŸèƒ½é€‰æ‹©
 void function(int sockfd)
 {
 	int rt;
@@ -26,11 +26,11 @@ void function(int sockfd)
 	pthread_create(&receive_thread, NULL, receive, (void *)sockfd);
 	pthread_create(&send_thread, NULL, handler_receive, NULL);
 	
-	//ÏÔÊ¾×¢²áµÇÂ½²Ëµ¥
+	//æ˜¾ç¤ºæ³¨å†Œç™»é™†èœå•
 	login_menu();
 	while (-1 == (rt = log_in_menu(sockfd)));
 
-	//ÏÔÊ¾Ö÷²Ëµ¥
+	//æ˜¾ç¤ºä¸»èœå•
 	while(1)
 	{
 		main_menu();
@@ -38,9 +38,9 @@ void function(int sockfd)
 	}	
 }
 
-/*´¦Àí½ÓÊÕÏûÏ¢º¯Êı:
-* 11:×¢²á³É¹¦,  10:×¢²áÊ§°Ü.   22:µÇÂ½³É¹¦,  20:µÇÂ½Ê§°Ü
-* 33:ÊÕµ½µ¥ÁÄĞÅÏ¢,  44:²éÕÒµ½ºÃÓÑ  40:²éÕÒºÃÓÑÊ§°Ü
+/*å¤„ç†æ¥æ”¶æ¶ˆæ¯å‡½æ•°:
+* 11:æ³¨å†ŒæˆåŠŸ,  10:æ³¨å†Œå¤±è´¥.   22:ç™»é™†æˆåŠŸ,  20:ç™»é™†å¤±è´¥
+* 33:æ”¶åˆ°å•èŠä¿¡æ¯,  44:æŸ¥æ‰¾åˆ°å¥½å‹  40:æŸ¥æ‰¾å¥½å‹å¤±è´¥
 */
 int handler_receive(void)
 {
@@ -53,35 +53,35 @@ int handler_receive(void)
 			memset(&receive_data, 0, sizeof(AGREEMENT));
 			if(false == dequeue(receive_queue, &receive_data))
 			{
-				printf("ÏûÏ¢³ö¶Ó¶ÓÊ§°Ü!");
+				printf("æ¶ˆæ¯å‡ºé˜Ÿé˜Ÿå¤±è´¥!");
 				return -1;
 			}
 			switch(receive_data.order)
 			{
 				case 11:
-					printf("   ×¢²á³É¹¦, ÄúµÄÕËºÅÊÇ: %d\n", receive_data.friend_id);
+					printf("   æ³¨å†ŒæˆåŠŸ, æ‚¨çš„è´¦å·æ˜¯: %d\n", receive_data.friend_id);
 					receive_data.order = -1;
 					break;
 				case 10:
-					printf("   ×¢²áÊ§°Ü£¬ÇëÖØĞÂ×¢²á!\n");
+					printf("   æ³¨å†Œå¤±è´¥ï¼Œè¯·é‡æ–°æ³¨å†Œ!\n");
 					receive_data.order = -1;
 					break;
 				case 22:
-					printf("   µÇÂ½³É¹¦!\n");
+					printf("   ç™»é™†æˆåŠŸ!\n");
 					receive_data.order = -1;
 					break;
 				case 20:
-					printf("   µÇÂ½Ê§°Ü! ÇëÖØĞÂµÇÂ½!\n");
+					printf("   ç™»é™†å¤±è´¥! è¯·é‡æ–°ç™»é™†!\n");
 					receive_data.order = -1;
 					break;
 				case 33:
-					printf("   ÊÕµ½%s(%d)·¢À´µÄÏûÏ¢: %s\n",
+					printf("   æ”¶åˆ°%s(%d)å‘æ¥çš„æ¶ˆæ¯: %s\n",
 						  	receive_data.friend_nickname, receive_data.friend_id,
 						  	receive_data.information);
 					receive_data.order = -1;
 					break;
 				case 44:
-					//printf("   ºÃÓÑÁĞ±í:\n");
+					//printf("   å¥½å‹åˆ—è¡¨:\n");
 					
 					receive_data.order = -1;
 					break;
@@ -95,7 +95,7 @@ int handler_receive(void)
 }
 
 
-//·¢ËÍÏß³Ì
+//å‘é€çº¿ç¨‹
 void *_send(void * arg)
 {
 	int cnt;
@@ -109,45 +109,46 @@ void *_send(void * arg)
 	{
 		if(pSend_queue->front != pSend_queue->rear)
 		{			
-			// Çå¿ÕÃèÊö·û¼¯
+			
+			// æ¸…ç©ºæè¿°ç¬¦é›†
 			FD_ZERO(&wset);
 
-			// ÉèÖÃÃèÊö·ûµ½ÃèÊö·û¼¯
+			// è®¾ç½®æè¿°ç¬¦åˆ°æè¿°ç¬¦é›†
 			FD_SET(sockfd, &wset);
 			
-			//¼ì²âÊÇ·ñÓĞÏûÏ¢¿É¶Á
+			//æ£€æµ‹æ˜¯å¦æœ‰æ¶ˆæ¯å¯å†™
 			while( (-1 == (cnt = select(sockfd+1, NULL, &wset,
 					NULL, &timevalue))) && (EINTR == errno));
 			if(-1 == cnt)
 			{
-				perror("¼à²â¿ÉĞ´ÏûÏ¢Ê§°Ü!");
+				perror("ç›‘æµ‹å¯å†™æ¶ˆæ¯å¤±è´¥!");
 				sleep(1);
 				continue;
 			}
 
 			memset(&send_data, 0, send_data_len);
-
-			//ÏûÏ¢³ö¶Ó
+			
+			//æ¶ˆæ¯å‡ºé˜Ÿ
 			if(false == dequeue(pSend_queue, &send_data))
 			{
-				printf("ÏûÏ¢³ö¶ÓÊ§°Ü!");
+				printf("æ¶ˆæ¯å‡ºé˜Ÿå¤±è´¥!");
 				continue;
 			}		
-			cnt = recv(sockfd, &send_data, send_data_len, 0);
+			cnt = send(sockfd, &send_data, send_data_len, 0);
 			if(-1 == cnt)
 			{
-				printf("·¢ËÍÏûÏ¢Ê§°Ü!\n");
+				printf("å‘é€æ¶ˆæ¯å¤±è´¥!\n");
 			}
 			else{
-				printf("·¢ËÍÁË%d¸öÏûÏ¢!\n", cnt);
-				printf("·¢ËÍÇëÇó(%d), ÏûÏ¢(%s)³É¹¦!\n", 
+				printf("å‘é€äº†%dä¸ªæ¶ˆæ¯!\n", cnt);
+				printf("å‘é€è¯·æ±‚(%d), æ¶ˆæ¯(%s)æˆåŠŸ!\n", 
 						send_data.order, send_data.information);			
 			}		
 		}
 	}	
 }
 
-//½ÓÊÕÏß³Ì
+//æ¥æ”¶çº¿ç¨‹
 void *receive(void *arg)
 {
 	int tcp_cnt, udp_cnt, num = 3;
@@ -160,15 +161,15 @@ void *receive(void *arg)
 	
 	while(1)
 	{
-		// Çå¿ÕÃèÊö·û¼¯	
+		// æ¸…ç©ºæè¿°ç¬¦é›†	
 		FD_ZERO(&tcp_rset);
 		FD_ZERO(&udp_rset);
 		
-		// ÉèÖÃÃèÊö·ûµ½ÃèÊö·û¼¯
+		// è®¾ç½®æè¿°ç¬¦åˆ°æè¿°ç¬¦é›†
 		FD_SET(sockfd, &tcp_rset);
 		FD_SET(udp_socket, &udp_rset);
 		
-		//¼ì²âÊÇ·ñÓĞÏûÏ¢¿É¶Á
+		//æ£€æµ‹æ˜¯å¦æœ‰æ¶ˆæ¯å¯è¯»
 		while( (-1 == (tcp_cnt = select(sockfd+1, &tcp_rset, NULL,
 				 NULL, &timevalue))) && (EINTR == errno));
 		
@@ -177,13 +178,13 @@ void *receive(void *arg)
 			
 		if(-1 == tcp_cnt)
 		{
-			perror("¼à²âTCP¿É¶ÁÏûÏ¢Ê§°Ü!");
+			perror("ç›‘æµ‹TCPå¯è¯»æ¶ˆæ¯å¤±è´¥!");
 			sleep(1);
 			continue;
 		}
 		if(-1 == udp_cnt)
 		{
-			perror("¼à²âUDP¿É¶ÁÏûÏ¢Ê§°Ü!");
+			perror("ç›‘æµ‹UDPå¯è¯»æ¶ˆæ¯å¤±è´¥!");
 			sleep(1);
 			continue;
 		}
@@ -194,7 +195,7 @@ void *receive(void *arg)
 			udp_cnt = recv(sockfd, udp_rdbuf, sizeof(udp_rdbuf), 0);
 			if(udp_cnt > 0)
 			{
-				printf("½ÓÊÕµ½UDP·şÎñÆ÷ÏûÏ¢: %s\n", udp_rdbuf);
+				printf("æ¥æ”¶åˆ°UDPæœåŠ¡å™¨æ¶ˆæ¯: %s\n", udp_rdbuf);
 			}			
 		}
 
@@ -205,33 +206,33 @@ void *receive(void *arg)
 	
 			if(-1 == tcp_cnt)
 			{
-				printf("¶ÁÏûÏ¢Ê§°Ü!\n");
+				printf("è¯»æ¶ˆæ¯å¤±è´¥!\n");
 				continue;
 			}
 			else if(tcp_cnt > 0)
 			{
 				/*
-				//²âÊÔÓÃ
+				//æµ‹è¯•ç”¨
 				{
-					printf("½ÓÊÕµ½·şÎñÆ÷ÏûÏ¢(»ØÓ¦ÃüÁî%d): %s\n", recv_data.order,
+					printf("æ¥æ”¶åˆ°æœåŠ¡å™¨æ¶ˆæ¯(å›åº”å‘½ä»¤%d): %s\n", recv_data.order,
 							recv_data.information);
 					
 					temp_buf.information = CLT_TOKEN;
 					tcp_cnt = send(sockfd, &temp_buf, sizeof(temp_buf), 0);
 					if(-1 == tcp_cnt)
 					{
-						printf("×ª·¢·şÎñÆ÷ÏûÏ¢Ê§°Ü!\n");
+						printf("è½¬å‘æœåŠ¡å™¨æ¶ˆæ¯å¤±è´¥!\n");
 					}
 					else if(tcp_cnt > 0)
 					{
-						printf("×ª·¢·şÎñÆ÷ÏûÏ¢ (%s) ³É¹¦!\n", recv_data.information);
+						printf("è½¬å‘æœåŠ¡å™¨æ¶ˆæ¯ (%s) æˆåŠŸ!\n", recv_data.information);
 					}
 				}
 				*/
-				//ÏûÏ¢Èë¶Ó
+				//æ¶ˆæ¯å…¥é˜Ÿ
 				if(false == enqueue(receive_queue, recv_data))
 				{
-					printf("ÏûÏ¢Èë¶ÓÊ§°Ü!");
+					printf("æ¶ˆæ¯å…¥é˜Ÿå¤±è´¥!");
 					continue;
 				}			
 			}
@@ -240,19 +241,19 @@ void *receive(void *arg)
 }
 
 
-//³õÊ¼»¯¶ÓÁĞ
+//åˆå§‹åŒ–é˜Ÿåˆ—
 INFORMATION_QUEUE *init_queue(void)
 {
 	INFORMATION_QUEUE *pQueue = (INFORMATION_QUEUE *)malloc(sizeof(INFORMATION_QUEUE));
 	if(NULL == pQueue)
 	{
-		perror("·ÖÅä¶ÓÁĞÍ·ÄÚ´æÊ§°Ü!\n");
+		perror("åˆ†é…é˜Ÿåˆ—å¤´å†…å­˜å¤±è´¥!\n");
 		return NULL;
 	}
 	pQueue->front = pQueue->rear = (QUEUE_NODE *)malloc(sizeof(QUEUE_NODE));
 	if(NULL == pQueue->rear)
 	{
-		perror("·ÖÅä¶ÓÁĞÍ·½ÚµãÄÚ´æÊ§°Ü!\n");
+		perror("åˆ†é…é˜Ÿåˆ—å¤´èŠ‚ç‚¹å†…å­˜å¤±è´¥!\n");
 		return NULL;
 	}
 	memset(&pQueue->front->data, 0, sizeof(AGREEMENT));
@@ -260,13 +261,13 @@ INFORMATION_QUEUE *init_queue(void)
 	
 	return pQueue;
 }
-//Èë¶Ó
+//å…¥é˜Ÿ
 bool enqueue(INFORMATION_QUEUE *pQueue, AGREEMENT data)
 {
 	QUEUE_NODE *pNew = (QUEUE_NODE *)malloc(sizeof(QUEUE_NODE));
 	if(NULL == pNew)
 	{
-		perror("·ÖÅä½ÚµãÄÚ´æÊ§°Ü!\n");
+		perror("åˆ†é…èŠ‚ç‚¹å†…å­˜å¤±è´¥!\n");
 		return false;
 	}
 	pNew->data = data;
@@ -277,7 +278,7 @@ bool enqueue(INFORMATION_QUEUE *pQueue, AGREEMENT data)
 	return true;
 }
 
-//³ö¶Ó
+//å‡ºé˜Ÿ
 bool dequeue(INFORMATION_QUEUE *pQueue, AGREEMENT *pData)
 {
 	if(pQueue->rear == pQueue->front)
@@ -296,10 +297,10 @@ bool dequeue(INFORMATION_QUEUE *pQueue, AGREEMENT *pData)
 	return true;
 }
 
-/*¹¦ÄÜÑ¡Ôñ
-* 1:µ¥ÁÄ        2:ÈºÁÄ       3:²éÕÒºÃÓÑ
-* 4:Ìí¼ÓºÃÓÑ    5:²éÕÒÈº     6:´´½¨Èº  
-* 7:Ìí¼ÓÈº      8:·¢ËÍÎÄ¼ş   0:ÍË³ö
+/*åŠŸèƒ½é€‰æ‹©
+* 1:å•èŠ        2:ç¾¤èŠ       3:æŸ¥æ‰¾å¥½å‹
+* 4:æ·»åŠ å¥½å‹    5:æŸ¥æ‰¾ç¾¤     6:åˆ›å»ºç¾¤  
+* 7:æ·»åŠ ç¾¤      8:å‘é€æ–‡ä»¶   0:é€€å‡º
 */
 int choose_function(void)
 {
@@ -309,12 +310,12 @@ int choose_function(void)
 	{		
 		while(scanf("%d", &num) <= 0)
 		{
-			printf("ÊäÈë´íÎó, ÇëÖØĞÂÊäÈë!\n");
+			printf("è¾“å…¥é”™è¯¯, è¯·é‡æ–°è¾“å…¥!\n");
 			while((ch = getchar()) != '\n' && ch != EOF);
 		}
 		if(num > 8 || num < 0)
 		{
-			printf("±§Ç¸,Ã»ÓĞÕâ¸öÑ¡Ïî, ÇëÖØĞÂÊäÈë!\n");
+			printf("æŠ±æ­‰,æ²¡æœ‰è¿™ä¸ªé€‰é¡¹, è¯·é‡æ–°è¾“å…¥!\n");
 		}
 		else {
 			break;
@@ -323,7 +324,7 @@ int choose_function(void)
 	switch(num)
 	{
 		case 0:
-			printf("¸ĞĞ»Ê¹ÓÃ, 88~~\n");
+			printf("æ„Ÿè°¢ä½¿ç”¨, 88~~\n");
 			exit(0);
 		case 1:
 			single_chat();
@@ -350,12 +351,12 @@ int choose_function(void)
 			
 			break;
 		default:
-			printf("±§Ç¸,Ã»ÓĞÕâ¸öÑ¡Ïî\n");
+			printf("æŠ±æ­‰,æ²¡æœ‰è¿™ä¸ªé€‰é¡¹\n");
 			break;
 	}
 }
 
-//µ¥ÁÄ
+//å•èŠ
 int single_chat(void)
 {
 	AGREEMENT data;
@@ -364,22 +365,22 @@ int single_chat(void)
 	while(1)
 	{			
 		memset(&data, 0, sizeof(data));
-		printf("ÇëÎÊÄãÒª¸úÄÄÎ»ºÃÓÑ(ºÃÓÑID)ÁÄÌì? (°´0ÍË³öµ¥ÁÄ)");
+		printf("è¯·é—®ä½ è¦è·Ÿå“ªä½å¥½å‹(å¥½å‹ID)èŠå¤©? (æŒ‰0é€€å‡ºå•èŠ)");
 		scanf("%d", &data.mine_id);
 
 		if(0 == data.mine_id)
 		{
 			break;
 		}		
-		printf("ÄãÒª·¢ËÍµÄÏûÏ¢ÄÚÈİ(50×ÖÒÔÄÚ):\n");
+		printf("ä½ è¦å‘é€çš„æ¶ˆæ¯å†…å®¹(50å­—ä»¥å†…):\n");
 		gets(data.information);
 
 		while(1)
 		{
-			//ÏûÏ¢Èë¶Ó
+			//æ¶ˆæ¯å…¥é˜Ÿ
 			if(false == enqueue(pSend_queue, data))
 			{
-				printf("ÏûÏ¢Èë¶ÓÊ§°Ü!");
+				printf("æ¶ˆæ¯å…¥é˜Ÿå¤±è´¥!");
 				continue;
 			}
 			else {
@@ -389,7 +390,7 @@ int single_chat(void)
 	}
 }
 
-//×¢²áµÇÂ½²Ëµ¥
+//æ³¨å†Œç™»é™†èœå•
 int log_in_menu(int sockfd)
 {
 	int num;
@@ -398,11 +399,11 @@ int log_in_menu(int sockfd)
 	{		
 		while(scanf("%d", &num) <= 0)
 		{
-			printf("ÊäÈë´íÎó, ÇëÖØĞÂÊäÈë!\n");
+			printf("è¾“å…¥é”™è¯¯, è¯·é‡æ–°è¾“å…¥!\n");
 		}
 		if(num > 3 || num < 0)
 		{
-			printf("±§Ç¸,Ã»ÓĞÕâ¸öÑ¡Ïî, ÇëÖØĞÂÊäÈë!\n");
+			printf("æŠ±æ­‰,æ²¡æœ‰è¿™ä¸ªé€‰é¡¹, è¯·é‡æ–°è¾“å…¥!\n");
 		}
 		else {
 			break;
@@ -411,10 +412,10 @@ int log_in_menu(int sockfd)
 	switch(num)
 	{
 		case 0: 
-			printf("¸ĞĞ»Ê¹ÓÃ, 88~~\n");
+			printf("æ„Ÿè°¢ä½¿ç”¨, 88~~\n");
 			return -1;
 		case 1:
-			//×¢²áÕËºÅ
+			//æ³¨å†Œè´¦å·
 			_register(sockfd);
 			if(-1 == rt)
 			{
@@ -423,7 +424,7 @@ int log_in_menu(int sockfd)
 			usleep(8000);
 			break;
 		case 2:
-			//µÇÂ½
+			//ç™»é™†
 			log_in(sockfd);
 			if(-1 == rt)
 			{
@@ -435,7 +436,7 @@ int log_in_menu(int sockfd)
 }
 
 
-//×¢²á
+//æ³¨å†Œ
 int _register(int sockfd)
 {
 	AGREEMENT data;
@@ -443,14 +444,14 @@ int _register(int sockfd)
 	memset(&data, 0, sizeof(data));
 	data.order = 1;
 
-	strcpy(data.information, "ÇëÇó×¢²á");
+	strcpy(data.information, "è¯·æ±‚æ³¨å†Œ");
 
 	while(1)
 	{
-		//ÏûÏ¢Èë¶Ó
+		//æ¶ˆæ¯å…¥é˜Ÿ
 		if(false == enqueue(pSend_queue, data))
 		{
-			printf("ÏûÏ¢Èë¶ÓÊ§°Ü!");
+			printf("æ¶ˆæ¯å…¥é˜Ÿå¤±è´¥!");
 			continue;
 		}
 		else {
@@ -463,33 +464,33 @@ int _register(int sockfd)
 			   && (EINTR == errno));
 	if(-1 == cnt)
 	{
-		perror("·¢ËÍÇëÇó×¢²áÊ§°Ü!");
+		perror("å‘é€è¯·æ±‚æ³¨å†Œå¤±è´¥!");
 		return -1;
 	}
 	else if(cnt > 0)
 	{
-		printf("³É¹¦·¢ËÍÇëÇó %d ÏûÏ¢\n", data.order);
+		printf("æˆåŠŸå‘é€è¯·æ±‚ %d æ¶ˆæ¯\n", data.order);
 	}
 */	
 	return 0;
 }
 
 
-//µÇÂ½
+//ç™»é™†
 int log_in(int sockfd)
 {
 	AGREEMENT data;
 	int cnt;
 	memset(&data, 0, sizeof(data));
 	data.order = 2;
-	strcpy(data.information, "ÇëÇóµÇÂ½");
+	strcpy(data.information, "è¯·æ±‚ç™»é™†");
 
 	while(1)
 	{
-		//ÏûÏ¢Èë¶Ó
+		//æ¶ˆæ¯å…¥é˜Ÿ
 		if(false == enqueue(pSend_queue, data))
 		{
-			printf("ÏûÏ¢Èë¶ÓÊ§°Ü!");
+			printf("æ¶ˆæ¯å…¥é˜Ÿå¤±è´¥!");
 			continue;
 		}
 		else {
@@ -502,12 +503,12 @@ int log_in(int sockfd)
 			   && (EINTR == errno));
 	if(-1 == cnt)
 	{
-		perror("·¢ËÍÇëÇóµÇÂ½Ê§°Ü!");
+		perror("å‘é€è¯·æ±‚ç™»é™†å¤±è´¥!");
 		return -1;
 	}
 	else if(cnt > 0)
 	{
-		printf("³É¹¦·¢ËÍÇëÇó %d ÏûÏ¢\n", data.order);
+		printf("æˆåŠŸå‘é€è¯·æ±‚ %d æ¶ˆæ¯\n", data.order);
 	}
 */
 	
