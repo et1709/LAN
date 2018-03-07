@@ -414,6 +414,8 @@ int _register(int sockfd)
 	memset(&data, 0, sizeof(data));
 	data.order = 1;
 
+	strcpy(data.information, "请求注册");
+	
 	while((-1 == (cnt = send(sockfd, (void*)&data, sizeof(data), 0))) 
 			   && (EINTR == errno));
 	if(-1 == cnt)
@@ -421,6 +423,11 @@ int _register(int sockfd)
 		perror("发送请求注册失败!");
 		return -1;
 	}
+	else if(cnt > 0)
+	{
+		printf("成功发送请求 %d 消息\n", data.order);
+	}
+	
 	return 0;
 }
 
@@ -432,6 +439,7 @@ int log_in(int sockfd)
 	int cnt;
 	memset(&data, 0, sizeof(data));
 	data.order = 2;
+	strcpy(data.information, "请求登陆");
 
 	while((-1 == (cnt = send(sockfd, (void*)&data, sizeof(data), 0))) 
 			   && (EINTR == errno));
@@ -440,6 +448,12 @@ int log_in(int sockfd)
 		perror("发送请求登陆失败!");
 		return -1;
 	}
+	else if(cnt > 0)
+	{
+		printf("成功发送请求 %d 消息\n", data.order);
+	}
+
+	
 	return 0;
 }
 
