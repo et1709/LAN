@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <string.h>
 
 
 
@@ -52,7 +53,7 @@ bool dequeue(INFORMATION_QUEUE *pQueue, AGREEMENT *pData);
 int choose_function(void);
 int log_in_menu(int sockfd);
 //注册
-//int register(int sockfd);
+int _register(int sockfd);
 //登陆
 int log_in(int sockfd);
 int single_chat(void);
