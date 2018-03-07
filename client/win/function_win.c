@@ -60,28 +60,34 @@ int handler_receive(void)
 			{
 				case 11:
 					printf("   注册成功, 您的账号是: %d\n", receive_data.friend_id);
+					receive_data.order = -1;
 					break;
 				case 10:
 					printf("   注册失败，请重新注册!\n");
+					receive_data.order = -1;
 					break;
 				case 22:
 					printf("   登陆成功!\n");
+					receive_data.order = -1;
 					break;
 				case 20:
 					printf("   登陆失败! 请重新登陆!\n");
+					receive_data.order = -1;
 					break;
 				case 33:
 					printf("   收到%s(%d)发来的消息: %s\n",
 						  	receive_data.friend_nickname, receive_data.friend_id,
 						  	receive_data.information);
+					receive_data.order = -1;
 					break;
 				case 44:
 					//printf("   好友列表:\n");
 					
-					
+					receive_data.order = -1;
 					break;
 				case 40:
 
+					receive_data.order = -1;
 					break;
 			}
 		}
@@ -103,8 +109,8 @@ void *_send(void * arg)
 	{
 		if(pSend_queue->front != pSend_queue->rear)
 		{			
-			// 清空描述符集	
-			FD_ZERO(&wset);		
+			// 清空描述符集
+			FD_ZERO(&wset);
 
 			// 设置描述符到描述符集
 			FD_SET(sockfd, &wset);
@@ -124,7 +130,7 @@ void *_send(void * arg)
 			//消息出队
 			if(false == dequeue(pSend_queue, &send_data))
 			{
-				printf("消息出队队失败!");
+				printf("消息出队失败!");
 				continue;
 			}		
 			cnt = recv(sockfd, &send_data, send_data_len, 0);
@@ -132,12 +138,10 @@ void *_send(void * arg)
 			{
 				printf("发送消息失败!\n");
 			}
-			else if(cnt > 0)
-			{
-				printf("发送请求(%d)成功!\n", send_data.order);
-			}
 			else{
-				printf("发送了0个消息!\n");
+				printf("发送了%d个消息!\n", cnt);
+				printf("发送请求(%d), 消息(%s)成功!\n", 
+						send_data.order, send_data.information);			
 			}		
 		}
 	}	
@@ -351,16 +355,41 @@ int choose_function(void)
 	}
 }
 
+//单聊
 int single_chat(void)
 {
 	AGREEMENT data;
+	int cnt;
 
-	memset(&data, 0, sizeof(data));
-	printf("请问你要跟哪位好友聊天? ");
-	scanf("%d", &data.mine_id);
-	
+	while(1)
+	{			
+		memset(&data, 0, sizeof(data));
+		printf("请问你要跟哪位好友(好友ID)聊天? (按0退出单聊)");
+		scanf("%d", &data.mine_id);
+
+		if(0 == data.mine_id)
+		{
+			break;
+		}		
+		printf("你要发送的消息内容(50字以内):\n");
+		gets(data.information);
+
+		while(1)
+		{
+			//消息入队
+			if(false == enqueue(pSend_queue, data))
+			{
+				printf("消息入队失败!");
+				continue;
+			}
+			else {
+				break;
+			}
+		}
+	}
 }
 
+//注册登陆菜单
 int log_in_menu(int sockfd)
 {
 	int num;
@@ -415,7 +444,21 @@ int _register(int sockfd)
 	data.order = 1;
 
 	strcpy(data.information, "请求注册");
+
+	while(1)
+	{
+		//消息入队
+		if(false == enqueue(pSend_queue, data))
+		{
+			printf("消息入队失败!");
+			continue;
+		}
+		else {
+			break;
+		}
+	}
 	
+/*	
 	while((-1 == (cnt = send(sockfd, (void*)&data, sizeof(data), 0))) 
 			   && (EINTR == errno));
 	if(-1 == cnt)
@@ -427,7 +470,7 @@ int _register(int sockfd)
 	{
 		printf("成功发送请求 %d 消息\n", data.order);
 	}
-	
+*/	
 	return 0;
 }
 
@@ -441,6 +484,20 @@ int log_in(int sockfd)
 	data.order = 2;
 	strcpy(data.information, "请求登陆");
 
+	while(1)
+	{
+		//消息入队
+		if(false == enqueue(pSend_queue, data))
+		{
+			printf("消息入队失败!");
+			continue;
+		}
+		else {
+			break;
+		}
+	}
+
+/*
 	while((-1 == (cnt = send(sockfd, (void*)&data, sizeof(data), 0))) 
 			   && (EINTR == errno));
 	if(-1 == cnt)
@@ -452,7 +509,7 @@ int log_in(int sockfd)
 	{
 		printf("成功发送请求 %d 消息\n", data.order);
 	}
-
+*/
 	
 	return 0;
 }

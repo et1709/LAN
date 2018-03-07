@@ -1,4 +1,4 @@
-﻿#ifndef _CLIENT_H_
+#ifndef _CLIENT_H_
 #define _CLIENT_H_
 
 #include<stdio.h>
@@ -8,7 +8,7 @@
 #include"function.h"
 
 
-#define SVR_PORT 8080
+#define SVR_PORT 8888
 #define BCAST "192.168.16.255"
 
 

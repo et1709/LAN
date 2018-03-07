@@ -8,7 +8,7 @@
 #include"function.h"
 
 
-#define SVR_PORT 8080
+#define SVR_PORT 8888
 #define BCAST "192.168.16.255"
 
 
