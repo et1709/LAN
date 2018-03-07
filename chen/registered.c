@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include<string.h>
-#include<stdlib.h>
 #include"registered.h"
 
 /*void safe_flush(FILE *fp)
@@ -9,81 +8,58 @@
   while((ch = fagetc(fp)) != EOF && ch != '\n');
 
   }*/
-struct information nap;
 
 
-/*int main(void)
+int register_func(struct information *info)
 {  
-    char ass[20];
-	struct information;
-	int i;
-	printf("请输入需要创建的密码:");
-	system("stty -echo");
-	gets(nap.password);
-	system("stty echo");      
-	printf("%s", nap.password);
-	printf("请输入密码登陆:");
-	gets(ass);
-	i = strcmp(ass, nap.password);
-	if(i ==  0)
-	{
-	  printf("Yes!");
-	}
-	else
-	{
-	  printf("No!\n");
-	}
-
-	return 0;
-}
-
-int name()
-{
-	struct information;
-	printf("请输入需要创建的呢称:");
-	gets(nap.nickname);
-	printf("%s",nap.nickname);  
-	return ;  
-}*/
-
-int main(void)
-{
-	struct information;
-	char o;
-	printf("请选择性别:");
-	printf("m(男)     or      f(女)\n");
-set:
-	o = gerchar();
-	if(o == 'm' || o == 'M' || o == 'F' || o == 'f')
-	{
-
-		gender = o;
-	}
-	else
-	{
-
-		goto set;
-
-	}
-
-	return 0;
-
-}
-
-/*int age()
-{
-	int a;
+	char tmp_sex;
 	char ch;
+	int tmp_age;
+
+	//用于创建密码
+	printf("请输入需要创建的密码:\n");
+	system("stty -echo");
+	gets(info->password);
+	system("stty echo");     
+
+	//创建昵称
+	printf("请输入需要创建的呢称:\n");
+	gets(info->nickname);
+	printf("%s",info->nickname);  //打印输入的昵称
+	
+	//选择性别
+	printf("请选择性别:\n");
+	printf("m(男)     or      f(女)\n");
 	while(1)
 	{
-		while(scanf("%d", &a)  <= 0)
+		tmp_sex = getchar();
+		while((ch = getchar() != '\n' && ch != EOF));
+		if(tmp_sex == 'm' || tmp_sex == 'M' || tmp_sex == 'F' || tmp_sex == 'f')
+		{
+			info->sex = tmp_sex;
+			break;
+
+		}
+		//while((ch = getchar() != '\n' && ch != EOF));
+		printf("输入有误,请重新输入:\n");
+	}
+
+	//创建年龄
+	printf("请输入你的年龄:\n");
+	while(1)
+	{
+		if(scanf("%d", &tmp_age) <= 0)
 		{
 			printf("你的输入有误,请重新输入!\n");		
 			while((ch=getchar()) != '\n' && ch!= EOF);
 		}
+        //成功输入
+		info->age = tmp_age;
 		break;
 	}
-	printf("a = %d\n", a);
 
-	return ;
-}*/
+	printf("%s,%s,%c,%d\n", info->password, info->nickname,
+			info->sex, info->age);
+	return 0;
+}
+
