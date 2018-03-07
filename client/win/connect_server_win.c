@@ -1,6 +1,8 @@
 #include"connect_server.h"
 
 int global_tcp_sockfd;
+int udp_socket;
+
 
 /*
 *功能:    先用UDP查找服务器,再用TCP连接服务器
@@ -203,7 +205,7 @@ int udp_broadcast(struct sockaddr_in* pSvr_addr, char *ip, unsigned short port)
     }
 
 	//7,关闭套接字
-	close(udp_socket);
+	//close(udp_socket);
 	
 	return 0;
 }

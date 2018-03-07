@@ -18,6 +18,8 @@
 #define SVR_TOKEN  "Hello client"
 #define CLT_TOKEN  "Hello server"
 
+extern int udp_socket;
+
 int connect_server(char *, unsigned short );
 int udp_broadcast(struct sockaddr_in* , char *, unsigned short );
 //SIGPIPE信号回调函数
