@@ -30,7 +30,7 @@ int connect_server(char *ip, unsigned short port)
 //SIGPIPE信号回调函数
 void sig_callback(int sig)
 {
-	printf("服务器丢失!");
+	printf("服务器丢失!\n");
 	close(global_tcp_sockfd);
 }
 

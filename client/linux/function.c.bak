@@ -21,14 +21,9 @@ void function(int sockfd)
 	pthread_create(&receive_thread, NULL, receive, (void *)&parameter);
 	
 	//显示注册登陆菜单
-	while (-1 == (rt = log_in()))
-	{
-		login_menu();
-	}
-	if(-1 == rt)
-	{
-		return;
-	}
+	login_menu();
+	while (-1 == (rt = log_in()));
+
 	//显示主菜单
 	main_menu();
 	choose_function();
@@ -36,7 +31,7 @@ void function(int sockfd)
 	
 }
 
-/*
+/*处理接收消息函数:
 * 11:注册成功,  10:注册失败.   22:登陆成功,  20:登陆失败
 * 33:收到单聊信息,  44:查找到好友  40:查找好友失败
 */
@@ -117,11 +112,11 @@ void *_send(void * arg)
 			continue;
 		}		
 		cnt = recv(sockfd, &send_data, send_data_len, 0);
-		if(-1 == cnt || 0 == cnt)
+		if(-1 == cnt)
 		{
 			printf("发送消息失败!\n");
 		}
-		else if(0 != cnt)
+		else if(cnt > 0)
 		{
 			printf("发送请求(%d)成功!\n", send_data.order);
 		}
@@ -134,7 +129,7 @@ void *_send(void * arg)
 //接收线程
 void *receive(void *arg)
 {
-	int cnt;
+	int cnt, num = 3;
 	PARAMETER *parameter = (PARAMETER *)arg;
 	fd_set rset;
 	struct timeval timevalue = {1, 0};
@@ -144,7 +139,7 @@ void *receive(void *arg)
 	while(1)
 	{
 		// 清空描述符集	
-		FD_ZERO(&rset);		
+		FD_ZERO(&rset);
 
 		// 设置描述符到描述符集
 		FD_SET(parameter->sockfd, &rset);
@@ -165,19 +160,20 @@ void *receive(void *arg)
 			printf("读消息失败!\n");
 			continue;
 		}
-
-		printf("接收到服务器消息(回应命令%d): %s\n", recv_data.order,
-				recv_data.information);
-		
-		//消息入队
-		if(false == enqueue(receive_queue, recv_data))
+		else if(cnt > 0)
 		{
-			printf("消息入队失败!");
-			continue;
-		}
+			printf("接收到服务器消息(回应命令%d): %s\n", recv_data.order,
+				recv_data.information);
+			
+			//消息入队
+			if(false == enqueue(receive_queue, recv_data))
+			{
+				printf("消息入队失败!");
+				continue;
+			}
 
-		parameter->callBack();
-		
+			parameter->callBack();
+		}
 	}
 }
 
@@ -249,10 +245,10 @@ int choose_function(void)
 	char ch;
 	while(1)
 	{		
-		while(scanf("%d",&num) <= 0)
+		while(scanf("%d", &num) <= 0)
 		{
 			printf("输入错误, 请重新输入!\n");
-			while((ch=getchar()) != '\n' && ch! = EOF);
+			while((ch = getchar()) != '\n' && ch != EOF);
 		}
 		if(num > 8 || num < 0)
 		{
