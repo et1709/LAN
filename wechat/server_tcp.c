@@ -22,10 +22,13 @@ void *tcp_server_handle(void *arg)
 	char *cltip = NULL;           //建立客户端端 IP
 	in_port_t cltport;            //建立客户端端口号
 	char buf_r[128] = "";
-	char buf_w[128] = "";
+	char buf_w[128] = "Hello client";
 	int connect_status;
 	int index = (int)arg;
 	int connfd = infos[index].tcp_connfd;
+	struct sockaddr_in target_cltaddr;
+	AGREEMENT *packet = &(infos[index].dataPacket);
+	int read_len = 0;
 	
 	//提取客户端IP和端口
 	cltip = inet_ntoa(infos[index].tcp_cltaddr.sin_addr);
@@ -35,6 +38,7 @@ void *tcp_server_handle(void *arg)
 	{
 		memset(buf_r, 0 ,sizeof buf_r);//清空缓冲区
 		connect_status = r_recv(connfd, buf_r, sizeof buf_r);
+		printf("\n接收到客户端TCP消息：%s\n", buf_r);
 		if(connect_status == -1)
 		{
 			printf("读取消息失败\n");
@@ -58,26 +62,37 @@ void *tcp_server_handle(void *arg)
 		// 应答
 		if(strcmp(buf_r, "Hello server") == 0)
 		{
-			//将新上线的客户发送给在线的客户端
-			memset(buf_w, 0 ,sizeof buf_w);//清空缓冲区
-			sprintf(buf_w, "%s(%d)", inet_ntoa(infos[index].tcp_cltaddr.sin_addr)
-									,ntohs(infos[index].tcp_cltaddr.sin_port));
-			strcat(buf_w, " 已上线...\n");
-			for(index = 0; index < MAXBACKLOG; index++)
+			//connect_status = uin_sendto(infos[index].tcp_connfd, buf_w, strlen(buf_w), &(infos[index].tcp_cltaddr));
+			connect_status = r_send(infos[index].tcp_connfd, buf_w, strlen(buf_w));
+			if (connect_status == -1)
 			{
-				connect_status = uin_sendto(infos[index].tcp_connfd, buf_w, strlen(buf_w), &(infos[index].tcp_cltaddr));
-				//connect_status = r_send(infos[index].tcp_connfd, buf_w, strlen(buf_w));
-				if (connect_status == -1)
-				{
-					printf("发送失败\n");
-					goto _out;
-				}
-				else
-				{
-					printf("发送成功：%s\n", buf_w);
-				}
+				printf("发送失败\n");
+				//goto _out;
 			}
-		}			
+			else
+			{
+				printf("发送成功：%s\n", buf_w);
+				memset(buf_r, 0 ,sizeof buf_r);//清空缓冲区
+			}
+		}	
+
+		cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
+
+		if((read_len = r_recv(connfd, (void *)packet, sizeof (AGREEMENT))) > 0)
+		{
+			cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
+			handle_request(packet, index);             //处理客户端请求
+			printf("接收到（%s）的消息：%s\n", inet_ntoa(infos[index].tcp_cltaddr.sin_addr), 
+													packet->information);
+		}
+
+		while(1)
+		{
+			target_cltaddr = handle_request(packet, index);  //处理客户端请求
+
+			//发送消息
+			uin_sendto(infos[index].tcp_connfd, (void *)packet, sizeof (AGREEMENT), &target_cltaddr);
+		}
 	}
 	_out:
 	// 释放线程信息空间
@@ -103,31 +118,8 @@ void *receive_msg(void *arg)
 	
 	while(1)
 	{
-		connect_status = r_recv(connfd, buf_r, sizeof buf_r);
-		// 应答
-		if(strcmp(buf_r, "Hello server") == 0)
-		{
-			//将新上线的客户发送给在线的客户端
-			memset(buf_w, 0 ,sizeof buf_w);//清空缓冲区
-			sprintf(buf_w, "%s(%d)", inet_ntoa(infos[index].tcp_cltaddr.sin_addr)
-									,ntohs(infos[index].tcp_cltaddr.sin_port));
-			strcat(buf_w, " 已上线...\n");
-			for(index = 0; index < MAXBACKLOG; index++)
-			{
-				connect_status = uin_sendto(infos[index].tcp_connfd, buf_w, strlen(buf_w), &(infos[index].tcp_cltaddr));
-				//connect_status = r_send(infos[index].tcp_connfd, buf_w, strlen(buf_w));
-				if (connect_status == -1)
-				{
-					printf("发送失败\n");
-					goto _out;
-				}
-				else
-				{
-					printf("发送成功：%s\n", buf_w);
-				}
-			}
-		}			
-		//cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
+		
+		cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
 
 		if((read_len = r_recv(connfd, (void *)packet, sizeof (AGREEMENT))) > 0)
 		{

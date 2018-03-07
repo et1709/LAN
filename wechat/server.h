@@ -17,7 +17,7 @@
 #include "protocol.h"
 
 /************宏定义************/
-#define SOCKET_PORT 8080 //端口号
+#define SOCKET_PORT 8888 //端口号
 #define MAXBACKLOG  50   //最大连接数量
 #define SIZE_SHMADD 2048 //共享内存的大小
 

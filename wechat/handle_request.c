@@ -9,7 +9,7 @@ struct sockaddr_in handle_request(AGREEMENT *packet, int index)
 			break;
 
 		case 2:
-			//login_req(packet, index);      //µÇÂ¼
+			login_req(packet, index);      //µÇÂ¼
 			break;
 
 		case 3:

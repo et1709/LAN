@@ -1,4 +1,4 @@
-﻿#include "server.h"
+#include "server.h"
 
 struct info infos[MAXBACKLOG];
 struct ClientInfo cliInfos[MAXBACKLOG]; //已登录的客户信息
@@ -31,14 +31,14 @@ int main()
 		infos[index].tcp_cltaddr = tcp_init.tcp_cltaddr;
 		
 		//客户端连接线程
-		/*pthread_create(&infos[index].thread, NULL,
-					tcp_server_handle, (void *)index);*/
-		//接收消息线程
 		pthread_create(&infos[index].thread, NULL,
-						receive_msg, (void *)index);
+					tcp_server_handle, (void *)index);
+		//接收消息线程
+		/*pthread_create(&infos[index].thread, NULL,
+						receive_msg, (void *)index);*/
 		//发送消息线程
-		//pthread_create(&infos[index].thread, NULL,
-						//send_msg, (void *)index);
+		/*pthread_create(&infos[index].thread, NULL,
+						send_msg, (void *)index);*/
 	}
 	
 	if(tcp_server_close(&tcp_init) == 0)  //TCP 服务器关闭连接
