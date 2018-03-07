@@ -10,8 +10,8 @@
 */
 struct lis
 {
-	int friend_id[20];
-	char friend_nickname[20][10];
+	int friend_id[6];
+	char friend_nickname[20][11];
 };
 
 /*
@@ -31,14 +31,16 @@ struct lis
 */
 typedef struct agr{
 	int order;
-	int mine_id;
-	int friend_id;
-	char nickname[20];
-	char friend_nickname[20];
-	char password[20];
+	char mine_id[6];
+	char friend_id[6];
+	char nickname[11];
+	char friend_nickname[11];
+	char password[6];
 	struct lis friend_list;
 	char information[100];
 	char send_msg_time[20];
+	char age[4];                  //用户创建的年龄 
+	char sex;                     //用户创建的性别 
 }AGREEMENT;
 
 

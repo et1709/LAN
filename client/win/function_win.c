@@ -416,6 +416,7 @@ int log_in_menu(int sockfd)
 			return -1;
 		case 1:
 			//×¢²áÕËºÅ
+			
 			_register(sockfd);
 			if(-1 == rt)
 			{
@@ -441,8 +442,17 @@ int _register(int sockfd)
 {
 	AGREEMENT data;
 	int cnt;
+	struct information input_data;
+
+	memset(&input_data, 0, sizeof(input_data));
 	memset(&data, 0, sizeof(data));
+
+	register_func( &input_data);
+	
 	data.order = 1;
+	strcpy(data.mine_id, input_data.login_account);
+	strcpy(data.nickname, input_data.nickname);
+	strcpy(data.password, input_data.password);	
 
 	strcpy(data.information, "ÇëÇó×¢²á");
 
@@ -481,6 +491,8 @@ int log_in(int sockfd)
 {
 	AGREEMENT data;
 	int cnt;
+	struct information input_data;
+	memset(&input_data, 0, sizeof(input_data));
 	memset(&data, 0, sizeof(data));
 	data.order = 2;
 	strcpy(data.information, "ÇëÇóµÇÂ½");
