@@ -52,7 +52,7 @@ bool dequeue(INFORMATION_QUEUE *pQueue, AGREEMENT *pData);
 int choose_function(void);
 int log_in_menu(int sockfd);
 //×¢²á
-//int register(int sockfd);
+int _register(int sockfd);
 //µÇÂ½
 int log_in(int sockfd);
 int single_chat(void);

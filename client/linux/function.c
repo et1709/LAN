@@ -23,7 +23,7 @@ void function(int sockfd)
 	*/
 	
 	pthread_create(&send_thread, NULL, _send, (void *)sockfd);
-	pthread_create(&receive_thread, NULL, receive, (void *)&sockfd);
+	pthread_create(&receive_thread, NULL, receive, (void *)sockfd);
 	pthread_create(&send_thread, NULL, handler_receive, NULL);
 	
 	//显示注册登陆菜单
@@ -159,7 +159,7 @@ void *receive(void *arg)
 		// 清空描述符集	
 		FD_ZERO(&tcp_rset);
 		FD_ZERO(&udp_rset);
-
+		
 		// 设置描述符到描述符集
 		FD_SET(sockfd, &tcp_rset);
 		FD_SET(udp_socket, &udp_rset);
@@ -187,7 +187,7 @@ void *receive(void *arg)
 		if (FD_ISSET(udp_socket, &udp_rset))
 		{
 			memset(udp_rdbuf, 0, sizeof(udp_rdbuf));
-			udp_cnt = recv(sockfd, &udp_rdbuf, sizeof(udp_rdbuf), 0);
+			udp_cnt = recv(sockfd, udp_rdbuf, sizeof(udp_rdbuf), 0);
 			if(udp_cnt > 0)
 			{
 				printf("接收到UDP服务器消息: %s\n", udp_rdbuf);
@@ -353,7 +353,12 @@ int choose_function(void)
 
 int single_chat(void)
 {
-	printf("请问你要跟哪位好友聊天: ");
+	AGREEMENT data;
+
+	memset(&data, 0, sizeof(data));
+	printf("请问你要跟哪位好友聊天? ");
+	scanf("%d", &data.mine_id);
+	
 }
 
 int log_in_menu(int sockfd)
@@ -381,7 +386,7 @@ int log_in_menu(int sockfd)
 			return -1;
 		case 1:
 			//注册账号
-			//register(sockfd);
+			_register(sockfd);
 			if(-1 == rt)
 			{
 				return -1;
@@ -400,16 +405,16 @@ int log_in_menu(int sockfd)
 	}
 }
 
-/*
+
 //注册
-int register(int sockfd)
+int _register(int sockfd)
 {
 	AGREEMENT data;
 	int cnt;
 	memset(&data, 0, sizeof(data));
 	data.order = 1;
 
-	while((-1 == (cnt = send(sockfd, data, sizeof(data), 0))) 
+	while((-1 == (cnt = send(sockfd, (void*)&data, sizeof(data), 0))) 
 			   && (EINTR == errno));
 	if(-1 == cnt)
 	{
@@ -418,7 +423,7 @@ int register(int sockfd)
 	}
 	return 0;
 }
-*/
+
 
 //登陆
 int log_in(int sockfd)
