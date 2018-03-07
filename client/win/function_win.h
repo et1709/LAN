@@ -10,7 +10,7 @@
 #include <sys/socket.h>
 #include <string.h>
 
-#include "registered"
+#include "registered.h"
 #include "connect_server.h"
 #include "protocol.h"
 #include "show_menu.h"

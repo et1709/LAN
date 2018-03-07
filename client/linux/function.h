@@ -1,17 +1,20 @@
 ﻿#ifndef _FUNCTION_H_
 #define _FUNCTION_H_
 
-#include<stdio.h>
-#include"connect_server.h"
-#include"protocol.h"
-#include"show_menu.h"
-#include<stdbool.h>
+#include <stdio.h>
+#include <stdbool.h>
 #include <errno.h>
-#include<stdlib.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <string.h>
+
+#include "registered.h"
+#include "connect_server.h"
+#include "protocol.h"
+#include "show_menu.h"
+
 
 
 

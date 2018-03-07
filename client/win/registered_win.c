@@ -18,19 +18,19 @@ int register_func(struct information *info)
 
 	while((ch = getchar() != '\n' && ch != EOF));
 	printf("创建账号:\n");	
-	gets_s(info->login_account, 5);
+	fgets(info->login_account, 6, stdin);
 	
 	//用于创建密码
 	printf("请输入需要创建的密码:\n");
 	system("stty -echo");
 	while((ch = getchar() != '\n' && ch != EOF));
-	gets_s(info->password, 5);	
+	fgets(info->password, 6, stdin);
 	system("stty echo");     
 
 	//创建昵称
 	printf("请输入需要创建的呢称:\n");
 	while((ch = getchar() != '\n' && ch != EOF));
-	gets_s(info->nickname, 10);
+	fgets(info->nickname, 6, stdin);
 	
 	//printf("%s",info->nickname);  //打印输入的昵称
 	
@@ -63,8 +63,8 @@ int register_func(struct information *info)
 		break;
 	}
 
-	printf("%s,%s,%c,%d\n", info->password, info->nickname,
-			info->sex, info->age);
+	//printf("%s,%s,%c,%d\n", info->password, info->nickname,
+			//info->sex, info->age);
 	return 0;
 }
 

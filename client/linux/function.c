@@ -59,7 +59,7 @@ int handler_receive(void)
 			switch(receive_data.order)
 			{
 				case 11:
-					printf("   注册成功, 您的账号是: %d\n", receive_data.friend_id);
+					printf("   注册成功, 您的账号是: %s\n", receive_data.friend_id);
 					receive_data.order = -1;
 					break;
 				case 10:
@@ -75,7 +75,7 @@ int handler_receive(void)
 					receive_data.order = -1;
 					break;
 				case 33:
-					printf("   收到%s(%d)发来的消息: %s\n",
+					printf("   收到%s(%s)发来的消息: %s\n",
 						  	receive_data.friend_nickname, receive_data.friend_id,
 						  	receive_data.information);
 					receive_data.order = -1;
@@ -366,9 +366,9 @@ int single_chat(void)
 	{			
 		memset(&data, 0, sizeof(data));
 		printf("请问你要跟哪位好友(好友ID)聊天? (按0退出单聊)");
-		scanf("%d", &data.mine_id);
+		fgets(data.mine_id, 6, stdin);
 
-		if(0 == data.mine_id)
+		if(0 == strcmp( data.mine_id, "0"))
 		{
 			break;
 		}		
@@ -416,6 +416,7 @@ int log_in_menu(int sockfd)
 			return -1;
 		case 1:
 			//注册账号
+			
 			_register(sockfd);
 			if(-1 == rt)
 			{
@@ -441,8 +442,17 @@ int _register(int sockfd)
 {
 	AGREEMENT data;
 	int cnt;
+	struct information input_data;
+
+	memset(&input_data, 0, sizeof(input_data));
 	memset(&data, 0, sizeof(data));
+
+	register_func( &input_data);
+	
 	data.order = 1;
+	strcpy(data.mine_id, input_data.login_account);
+	strcpy(data.nickname, input_data.nickname);
+	strcpy(data.password, input_data.password);	
 
 	strcpy(data.information, "请求注册");
 
@@ -475,14 +485,20 @@ int _register(int sockfd)
 	return 0;
 }
 
-
 //登陆
 int log_in(int sockfd)
 {
 	AGREEMENT data;
 	int cnt;
+	struct information input_data;
+	memset(&input_data, 0, sizeof(input_data));
 	memset(&data, 0, sizeof(data));
+	
+	login_information(&input_data);
+
 	data.order = 2;
+	strcpy(data.mine_id, input_data.login_account);
+	strcpy(data.password, input_data.login_password);		
 	strcpy(data.information, "请求登陆");
 
 	while(1)
