@@ -13,10 +13,10 @@ int main()
 
 	while(1)
 	{
-		udp_server_init();     //UDP 服务器初始化,循环监听
-		
 		int index;
-		
+
+		udp_server_init(index);     //UDP 服务器初始化,循环监听
+
 		//等待客户端连接
 		tcp_init.tcp_connfd = uin_accept(tcp_init.tcp_socket, &(tcp_init.tcp_cltaddr));
 		if(tcp_init.tcp_connfd == -1)
@@ -31,14 +31,14 @@ int main()
 		infos[index].tcp_cltaddr = tcp_init.tcp_cltaddr;
 		
 		//客户端连接线程
-		pthread_create(&infos[index].thread, NULL,
-					tcp_server_handle, (void *)index);
+		/*pthread_create(&infos[index].thread, NULL,
+					tcp_server_handle, (void *)index);*/
 		//接收消息线程
-		//pthread_create(&infos[index].thread, NULL,
-						//receive_msg, (void *)index);
+		pthread_create(&infos[index].thread, NULL,
+						receive_msg, (void *)index);
 		//发送消息线程
-		//pthread_create(&infos[index].thread, NULL,
-						//send_msg, (void *)index);
+		pthread_create(&infos[index].thread, NULL,
+						send_msg, (void *)index);
 	}
 	
 	if(tcp_server_close(&tcp_init) == 0)  //TCP 服务器关闭连接

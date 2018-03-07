@@ -47,7 +47,7 @@ struct ClientInfo
 
 /************函数声明************/
 //**********UDP**********
-int udp_server_init();
+int udp_server_init(int index);
 //**********TCP**********
 int tcp_server_init(struct TcpInit *tcp_init);
 int tcp_server_close(struct TcpInit *tcp_init);

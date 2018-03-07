@@ -12,11 +12,6 @@ int tcp_server_init(struct TcpInit *tcp_init)
 		printf("创建套接字失败\n");
 		return -1;
 	}
-	else
-	{
-		printf("Accept successful!\n");
-	}
-	
 	return 0;
 }
 
@@ -70,8 +65,8 @@ void *tcp_server_handle(void *arg)
 			strcat(buf_w, " 已上线...\n");
 			for(index = 0; index < MAXBACKLOG; index++)
 			{
-				//connect_status = uin_sendto(infos[index].tcp_connfd, buf_w, strlen(buf_w), &(infos[index].tcp_cltaddr));
-				connect_status = r_send(infos[index].tcp_connfd, buf_w, strlen(buf_w));
+				connect_status = uin_sendto(infos[index].tcp_connfd, buf_w, strlen(buf_w), &(infos[index].tcp_cltaddr));
+				//connect_status = r_send(infos[index].tcp_connfd, buf_w, strlen(buf_w));
 				if (connect_status == -1)
 				{
 					printf("发送失败\n");
@@ -102,17 +97,54 @@ void *receive_msg(void *arg)
 	int index = (int)arg;
 	int connfd = infos[index].tcp_connfd;
 	AGREEMENT *packet = &(infos[index].dataPacket);
+	char buf_r[128] = "";
+	char buf_w[128] = "";
+	int connect_status;
 	
 	while(1)
 	{
-		cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
+		connect_status = r_recv(connfd, buf_r, sizeof buf_r);
+		// 应答
+		if(strcmp(buf_r, "Hello server") == 0)
+		{
+			//将新上线的客户发送给在线的客户端
+			memset(buf_w, 0 ,sizeof buf_w);//清空缓冲区
+			sprintf(buf_w, "%s(%d)", inet_ntoa(infos[index].tcp_cltaddr.sin_addr)
+									,ntohs(infos[index].tcp_cltaddr.sin_port));
+			strcat(buf_w, " 已上线...\n");
+			for(index = 0; index < MAXBACKLOG; index++)
+			{
+				connect_status = uin_sendto(infos[index].tcp_connfd, buf_w, strlen(buf_w), &(infos[index].tcp_cltaddr));
+				//connect_status = r_send(infos[index].tcp_connfd, buf_w, strlen(buf_w));
+				if (connect_status == -1)
+				{
+					printf("发送失败\n");
+					goto _out;
+				}
+				else
+				{
+					printf("发送成功：%s\n", buf_w);
+				}
+			}
+		}			
+		//cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
 
 		if((read_len = r_recv(connfd, (void *)packet, sizeof (AGREEMENT))) > 0)
 		{
+			cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
 			handle_request(packet, index);             //处理客户端请求
 			printf("接收到（%s）的消息：%s\n", inet_ntoa(infos[index].tcp_cltaddr.sin_addr), 
 													packet->information);
 		}
+	}
+
+_out:
+	// 释放线程信息空间
+	memset(&infos[index], 0, sizeof (struct info));
+	// 关闭连接描述符
+	if (connfd != -1)
+	{
+		while ((-1 == close(connfd)) && (EINTR == errno));
 	}
 }
 
