@@ -85,14 +85,8 @@ void *tcp_server_handle(void *arg)
 			printf("接收到（%s）的消息：%s\n", inet_ntoa(infos[index].tcp_cltaddr.sin_addr), 
 													packet->information);
 		}
+			//target_cltaddr = handle_request(packet, index);  //处理客户端请求
 
-		while(1)
-		{
-			target_cltaddr = handle_request(packet, index);  //处理客户端请求
-
-			//发送消息
-			uin_sendto(infos[index].tcp_connfd, (void *)packet, sizeof (AGREEMENT), &target_cltaddr);
-		}
 	}
 	_out:
 	// 释放线程信息空间

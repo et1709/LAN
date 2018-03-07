@@ -15,6 +15,7 @@
 
 #include "uinsock.h"
 #include "protocol.h"
+#include "database.h"
 
 /************宏定义************/
 #define SOCKET_PORT 8888 //端口号

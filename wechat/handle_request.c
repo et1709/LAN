@@ -28,26 +28,31 @@ struct sockaddr_in handle_request(AGREEMENT *packet, int index)
 
 
 //1.注册
-//void register_req(AGREEMENT *packet, int index)
-//{
-//	callback backupdat;
-//	AGREEMENT register_reply;
-//	char tmp_cmp[5];     //比较id大小的数组
-//	//打开数据库
-//	//在数据库中查询是否有此账号
-//	read_table(packet->nickname, user_table, packet->mine_id);
-//	if(strcmp(backupdat.parmt[0], id_InitNum) == 0)
-//	{
-//		//发送给客户端“注册失败”数据包
-//		register_reply.order = 10;
-//		r_send(infos[index].tcp_connfd, (void *)&register_reply, sizeof(AGREEMENT));
-//	}
-//	else
-//	{	
-//		id_InitNum++;
-//	}
-//	//如果没有，则注册
-//}
+void register_req(AGREEMENT *packet, int index)
+{
+	AGREEMENT register_reply;
+	char tmp_cmp[5];     //比较id大小的数组
+
+	char id[6] = packet->mine_id;
+	char nickname[11] = packet->nickname;
+	char password[6] = packet->password;
+	char age[4] = packet->age;
+	char sex = pacjet->sex;
+
+	//添加数据进入数据库，进行注册
+	if(add_to_database(id, nickname, password, age, sex) == 0) //注册成功
+	{
+		register_reply.order = 11;
+		//发送给客户端“注册成功”数据包
+		r_send(infos[index].tcp_connfd, (void *)&re_reply, sizeof(AGREEMENT));
+	}
+	else
+	{
+		register_reply.order = 10;
+		//发送给客户端“注册成功”数据包
+		r_send(infos[index].tcp_connfd, (void *)&re_reply, sizeof(AGREEMENT));
+	}
+}
 
 //2.登录
 void login_req(AGREEMENT *packet, int index)
@@ -60,11 +65,12 @@ void login_req(AGREEMENT *packet, int index)
 	login_reply.order = 22;
 
 	//返回的账号和昵称写入结构体中
-	cliInfos[cliNum].id = tmp_id;
-	strcpy(cliInfos[cliNum].nickname,tmp_nickname);
+	//cliInfos[cliNum].id = tmp_id;
+	//strcpy(cliInfos[cliNum].nickname,tmp_nickname);
 
 	//发送给客户端“登录成功”数据包
 	r_send(infos[index].tcp_connfd, (void *)&login_reply, sizeof(AGREEMENT));
+	//memset(&login_reply, 0 ,sizeof (AGREEMENT));//清空缓冲区
 
 	pthread_mutex_lock(&mutex);//加锁
 	/*---------- 临界区开始 -------------*/

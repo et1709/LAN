@@ -11,6 +11,8 @@ int main()
 		
 	tcp_server_init(&tcp_init);//TCPP 服务器初始化
 
+	creat_database();          //创建数据库
+
 	while(1)
 	{
 		int index;
