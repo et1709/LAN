@@ -1,3 +1,0 @@
----- tcp_connect Matches (2 in 1 files) ----
-Connect_server_win.c:	tcp_connect(&svr_addr);
-Connect_server_win.c://int tcp_connect(struct sockaddr_in* pSvr_addr)
