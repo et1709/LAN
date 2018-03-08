@@ -5,7 +5,7 @@ void login_menu(void)
 	printf("     1: 注册   2: 登陆   0: 退出\n");
 }
 
-void main_menu(void)
+void show_main_menu(void)
 {
 	printf("-----------------------------------------------------\n");
 	printf("                      主菜单\n");

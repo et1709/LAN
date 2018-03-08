@@ -14,12 +14,12 @@ int register_func(struct information *info)
 	i = 0;
 	while(1)
 	{		
-		info->login_account[i] = getchar();
-		if('\n' == info->login_account[i] && i < 5)
+		info->id[i] = getchar();
+		if('\n' == info->id[i] && i < 5)
 		{
 			i = 0;
 			printf("您输入的位数不够,请重新输入!\n");
-			memset(info->login_account, 0, sizeof(info->login_account));
+			memset(info->id, 0, sizeof(info->id));
 			continue;
 		}
 		else if(5 == i)
@@ -28,8 +28,8 @@ int register_func(struct information *info)
 		}
 		i++;
 	}
-	info->login_account[i] = '\0';
-	printf("login_account = %s\n", info->login_account);
+	info->id[i] = '\0';
+	printf("login_account = %s\n", info->id);
 	
 		
 	//用于创建密码

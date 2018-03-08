@@ -4,7 +4,9 @@ INFORMATION_QUEUE* pSend_queue;
 INFORMATION_QUEUE* receive_queue;
 
 extern int udp_socket;
-
+int LoginFlag = 0;
+int login_mark = 3;
+char buffer[20];
 
 //功能选择
 void function(int sockfd)
@@ -24,32 +26,45 @@ void function(int sockfd)
 	
 	pthread_create(&send_thread, NULL, _send, (void *)sockfd);
 	pthread_create(&receive_thread, NULL, receive, (void *)sockfd);
-	pthread_create(&send_thread, NULL, handler_receive, NULL);
+	pthread_create(&send_thread, NULL, handler_receive, (void *)sockfd);
 	
-	//显示注册登陆菜单
-	login_menu();
-	while (-1 == (rt = log_in_menu(sockfd)));
-
-	//显示主菜单
-	while(1)
+	//显示注册登陆菜单	
+	while (1)
 	{
-		main_menu();
-		choose_function();
+		login_menu();
+		log_in_menu(sockfd);
+		if(LoginFlag)
+		{
+			break;
+		}
 	}	
+	while(1)
+	{		
+		//进入主菜单
+		main_menu();		
+	}	
+}
+
+//主菜单
+void main_menu(void)
+{
+	show_main_menu();
+	choose_function();
 }
 
 /*处理接收消息函数:
 * 11:注册成功,  10:注册失败.   22:登陆成功,  20:登陆失败
 * 33:收到单聊信息,  44:查找到好友  40:查找好友失败
+* 66:添加好友成功,  60:添加好友失败
 */
-int handler_receive(void)
+int handler_receive(void *pSockfd)
 {
 	AGREEMENT receive_data;
-
+	int sockfd = (int)pSockfd;
 	while(1)
 	{		
 		if(receive_queue->front != receive_queue->rear)
-		{						
+		{
 			memset(&receive_data, 0, sizeof(AGREEMENT));
 			if(false == dequeue(receive_queue, &receive_data))
 			{
@@ -63,15 +78,19 @@ int handler_receive(void)
 					receive_data.order = -1;
 					break;
 				case 10:
-					printf("   注册失败，请重新注册!\n");
+					printf("   注册失败，失败原因: %s\n", receive_data.information);
+					printf("   请重新注册!\n");
 					receive_data.order = -1;
 					break;
 				case 22:
 					printf("   登陆成功!\n");
+					LoginFlag = 1;
 					receive_data.order = -1;
 					break;
 				case 20:
-					printf("   登陆失败! 请重新登陆!\n");
+					printf("   登陆失败! 失败原因: %s\n", receive_data.information);
+					printf("   请重新登陆!\n");
+					log_in(sockfd);
 					receive_data.order = -1;
 					break;
 				case 33:
@@ -89,6 +108,15 @@ int handler_receive(void)
 
 					receive_data.order = -1;
 					break;
+				case 66:
+					printf("添加好友成功!\n");
+					receive_data.order = -1;
+					break;
+				case 60:
+					printf("添加好友失败! 原因: %s\n", receive_data.information);	
+					receive_data.order = -1;
+					break;
+				
 			}
 		}
 	}
@@ -339,16 +367,16 @@ int choose_function(void)
 			printf("感谢使用, 88~~\n");
 			exit(0);
 		case 1:
-			single_chat();
+			single_chat();                //单聊
 			break;
 		case 2:
 			
 			break;
 		case 3:
-			find_friends();
+			find_friends();              //查找好友
 			break;
 		case 4:
-			add_friend();
+			add_friend();                //添加好友
 			break;
 		case 5:
 			
@@ -509,7 +537,7 @@ int _register(int sockfd)
 	register_func( &input_data);
 	
 	data.order = 1;
-	strcpy(data.mine_id, input_data.login_account);
+	strcpy(data.mine_id, input_data.id);
 	strcpy(data.nickname, input_data.nickname);
 	strcpy(data.password, input_data.password);
 	strcpy(data.age, input_data.age);
@@ -557,17 +585,20 @@ int _register(int sockfd)
 //登陆
 int log_in(int sockfd)
 {
+	printf("进入log_in函数\n");
 	AGREEMENT data;
 	int cnt;
 	struct information input_data;
 	memset(&input_data, 0, sizeof(input_data));
 	memset(&data, 0, sizeof(data));
 	
-	login_information(&input_data);
+	login_func(&data, &input_data, login_mark);
+
+	login_mark--;
 
 	data.order = 2;
-	strcpy(data.mine_id, input_data.login_account);
-	strcpy(data.password, input_data.login_password);		
+	strcpy(data.mine_id, input_data.id);
+	strcpy(data.password, input_data.password);		
 	strcpy(data.information, "请求登陆");
 
 	while(1)

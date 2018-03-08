@@ -515,7 +515,7 @@ int _register(int sockfd)
 	strcpy(data.age, input_data.age);
 	strcpy(data.sex, input_data.sex);
 	strcpy(data.information, "请求注册");
-
+/*
 	printf("=========注册返回信息:==========\n");
 	printf("nickname:%s, mine_id: %s\n",
 		    data.nickname, data.mine_id);
@@ -524,7 +524,7 @@ int _register(int sockfd)
 		    data.age, data.sex);
 
 	printf("=================================\n");
-
+*/
 	while(1)
 	{
 		//消息入队

@@ -38,8 +38,13 @@ typedef struct head
 	QUEUE_NODE* rear;
 }INFORMATION_QUEUE;
 
+extern char buffer[20];
+extern int login_mark;
+
+
+
 void function(int sockfd);
-int handler_receive(void);
+int handler_receive(void *);
 void *_send(void *arg);
 void *receive(void *arg);
 INFORMATION_QUEUE *init_queue(void);
@@ -65,6 +70,7 @@ int find_friends(void);
 //单聊
 int single_chat(void);
 void add_friend(void);          //添加好友
+void main_menu(void);            //主菜单
 
 
 
