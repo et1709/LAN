@@ -20,7 +20,7 @@ struct lis
 *                  服务器回应命令: 11:注册成功,10:注册失败. 22:登陆成功,20:登陆失败
 *                                  33:收到单聊信息, 44:查找到好友 40:查找好友失败
 *								   
-*mine_id:   	   自己的账号
+*mine_id:   	   
 *friend_id:        好友的账号
 *nickname:         自己的昵称
 *friend_nickname   好友的昵称
@@ -31,8 +31,9 @@ struct lis
 */
 typedef struct agr{
 	int order;
-	char mine_id[6];
+	char mine_id[6];			  //自己的账号
 	char friend_id[6];
+	char herd_id[5];
 	char nickname[11];
 	char friend_nickname[11];
 	char password[6];
@@ -40,7 +41,7 @@ typedef struct agr{
 	char information[100];
 	char send_msg_time[20];
 	char age[4];                  //用户创建的年龄 
-	char sex[2];                     //用户创建的性别 
+	char sex[2];                  //用户创建的性别 	
 }AGREEMENT;
 
 

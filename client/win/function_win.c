@@ -348,7 +348,7 @@ int choose_function(void)
 			find_friends();
 			break;
 		case 4:
-			//add_friend();
+			add_friend();
 			break;
 		case 5:
 			
@@ -368,17 +368,17 @@ int choose_function(void)
 	}
 }
 
-/*
 //添加好友
 void add_friend(void)
 {
 	AGREEMENT data;
 	char ch;
-	
+	memset(&data, 0, sizeof(data));
+	data.order = 4;
 	printf("请输入您好友的账号:\n");
 	while((ch = getchar() != '\n' && ch != EOF));
 	fgets(data.friend_id, 6, stdin);
-	strcpy(data.information, "查找好友");
+	strcpy(data.information, "添加好友");
 	while(1)
 	{
 		//消息入队
@@ -392,18 +392,20 @@ void add_friend(void)
 		}
 	}
 }
-*/
 
 //查找好友
 int find_friends(void)
 {
 	AGREEMENT data;
 	char ch;
-	
+
+	memset(&data, 0, sizeof(data));
+	data.order = 3;
 	printf("请输入您好友的账号:\n");
 	while((ch = getchar() != '\n' && ch != EOF));
 	fgets(data.friend_id, 6, stdin);
 	strcpy(data.information, "查找好友");
+	
 	while(1)
 	{
 		//消息入队
@@ -419,7 +421,6 @@ int find_friends(void)
 	return 0;
 }
 
-
 //单聊
 int single_chat(void)
 {
@@ -430,6 +431,7 @@ int single_chat(void)
 	while(1)
 	{			
 		memset(&data, 0, sizeof(data));
+		data.order = 1;
 		printf("请问你要跟哪位好友(好友ID)聊天? (按0退出单聊)");
 		while((ch = getchar() != '\n' && ch != EOF));
 		fgets(data.mine_id, 6, stdin);

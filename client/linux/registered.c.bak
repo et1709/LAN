@@ -36,6 +36,7 @@ int register_func(struct information *info)
 
 	//创建年龄
 	printf("请输入你的年龄:\n");
+	while((ch = getchar() != '\n' && ch != EOF));
 	fgets(info->age, 4, stdin);
 	/*
 	while(1)
