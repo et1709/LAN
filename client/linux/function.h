@@ -60,6 +60,14 @@ int _register(int sockfd);
 //登陆
 int log_in(int sockfd);
 int single_chat(void);
+//查找好友
+int find_friends(void);
+//单聊
+int single_chat(void);
+void add_friend(void);          //添加好友
+
+
+
 
 
 

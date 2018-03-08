@@ -36,6 +36,7 @@ int register_func(struct information *info)
 
 	//创建年龄
 	printf("请输入你的年龄:\n");
+	while((ch = getchar() != '\n' && ch != EOF));
 	fgets(info->age, 4, stdin);
 	/*
 	while(1)
@@ -55,19 +56,23 @@ int register_func(struct information *info)
 	
 	//选择性别
 	printf("请选择性别:\n");
-	printf("男(m/M)    or      女(f/F)\n");
+	printf("男(m/M)      or      女(f/F)\n");
+	while((ch = getchar() != '\n' && ch != EOF));
+	fgets(info->sex, 2, stdin);
+	
+/*
 	while(1)
 	{			
 		while((ch = getchar() != '\n' && ch != EOF));
 		fgets(info->sex, 2, stdin);
-		if('m' == info->sex[0] || 'M' == info->sex[0]
-			|| 'f' == info->sex[0] || 'F' == info->sex[0])
+		if(strcmp("m", info->sex) == 0 || strcmp("M", info->sex) == 0 
+			|| strcmp("f", info->sex) == 0 || strcmp("F", info->sex) == 0)
 		{			
 			break;
 		}
 		printf("输入错误，请重新输入:\n");
 	}
-
+*/
 		
 	return 0;
 }
