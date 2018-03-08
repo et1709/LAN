@@ -483,23 +483,13 @@ int log_in_menu(int sockfd)
 		case 0: 
 			printf("感谢使用, 88~~\n");
 			return -1;
-		case 1:
-			//注册账号
-			
-			_register(sockfd);
-			if(-1 == rt)
-			{
-				return -1;
-			}
+		case 1:			
+			_register(sockfd);     //注册账号			
 			usleep(8000);
 			break;
 		case 2:
-			//登陆
-			log_in(sockfd);
-			if(-1 == rt)
-			{
-				return -1;
-			}
+			
+			log_in(sockfd);        //登陆
 			usleep(8000);
 			break;
 	}
@@ -526,7 +516,14 @@ int _register(int sockfd)
 	strcpy(data.sex, input_data.sex);
 	strcpy(data.information, "请求注册");
 
-	//printf("age:%s, sex: %s\n", data.age, data.sex);
+	printf("=========注册返回信息:==========\n");
+	printf("nickname:%s, mine_id: %s\n",
+		    data.nickname, data.mine_id);
+	
+	printf("age:%s, sex: %s\n",
+		    data.age, data.sex);
+
+	printf("=================================\n");
 
 	while(1)
 	{

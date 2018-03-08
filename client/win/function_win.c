@@ -483,23 +483,13 @@ int log_in_menu(int sockfd)
 		case 0: 
 			printf("¸ĞĞ»Ê¹ÓÃ, 88~~\n");
 			return -1;
-		case 1:
-			//×¢²áÕËºÅ
-			
-			_register(sockfd);
-			if(-1 == rt)
-			{
-				return -1;
-			}
+		case 1:			
+			_register(sockfd);     //×¢²áÕËºÅ			
 			usleep(8000);
 			break;
 		case 2:
-			//µÇÂ½
-			log_in(sockfd);
-			if(-1 == rt)
-			{
-				return -1;
-			}
+			
+			log_in(sockfd);        //µÇÂ½
 			usleep(8000);
 			break;
 	}
@@ -526,7 +516,14 @@ int _register(int sockfd)
 	strcpy(data.sex, input_data.sex);
 	strcpy(data.information, "ÇëÇó×¢²á");
 
-	//printf("age:%s, sex: %s\n", data.age, data.sex);
+	printf("=========×¢²á·µ»ØĞÅÏ¢:==========\n");
+	printf("nickname:%s, mine_id: %s\n",
+		    data.nickname, data.mine_id);
+	
+	printf("age:%s, sex: %s\n",
+		    data.age, data.sex);
+
+	printf("=================================\n");
 
 	while(1)
 	{

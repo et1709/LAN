@@ -55,15 +55,15 @@ bool dequeue(INFORMATION_QUEUE *pQueue, AGREEMENT *pData);
 */
 int choose_function(void);
 int log_in_menu(int sockfd);
-//注册
-int _register(int sockfd);
-//登陆
-int log_in(int sockfd);
+
+int _register(int sockfd);       //注册
+
+int log_in(int sockfd);           //登陆
 int single_chat(void);
-//查找好友
-int find_friends(void);
-//单聊
-int single_chat(void);
+
+int find_friends(void);         //查找好友
+
+int single_chat(void);          //单聊
 void add_friend(void);          //添加好友
 
 
