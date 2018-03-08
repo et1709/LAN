@@ -522,12 +522,11 @@ int _register(int sockfd)
 	strcpy(data.mine_id, input_data.login_account);
 	strcpy(data.nickname, input_data.nickname);
 	strcpy(data.password, input_data.password);
-
+	strcpy(data.age, input_data.age);
+	strcpy(data.sex, input_data.sex);
 	strcpy(data.information, "ÇëÇó×¢²á");
 
-	printf("age:%s, sex: %s\n", data.age, data.sex);
-
-	
+	//printf("age:%s, sex: %s\n", data.age, data.sex);
 
 	while(1)
 	{

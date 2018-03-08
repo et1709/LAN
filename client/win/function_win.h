@@ -64,6 +64,8 @@ int single_chat(void);
 int find_friends(void);
 //µ¥ÁÄ
 int single_chat(void);
+void add_friend(void);          //Ìí¼ÓºÃÓÑ
+
 
 
 
