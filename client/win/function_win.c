@@ -142,15 +142,19 @@ void *_send(void * arg)
 			else{
 				printf("成功发送了%d个字节消息!\n", cnt);
 				printf("消息包内容是:\n");
-				printf("order:%d, information: %s",
+				printf("order:%d, information: %s\n",
 					    send_data.order, send_data.information);
-				printf("nickname:%s, mine_id: %s",
+				
+				printf("nickname:%s, mine_id: %s\n",
 					    send_data.nickname, send_data.mine_id);
-				printf("nickname:%s, mine_id: %s",
+				
+				printf("age:%s, sex: %s\n",
 					    send_data.age, send_data.sex);
-				printf("friend_nickname:%s, friend_id: %s",
+				
+				printf("friend_nickname:%s, friend_id: %s\n",
 					    send_data.friend_nickname, send_data.friend_id);
-				printf("send_msg_time:%s", send_data.send_msg_time);			
+				
+				printf("send_msg_time:%s\n", send_data.send_msg_time);			
 			}		
 		}
 	}	
@@ -515,9 +519,13 @@ int _register(int sockfd)
 	data.order = 1;
 	strcpy(data.mine_id, input_data.login_account);
 	strcpy(data.nickname, input_data.nickname);
-	strcpy(data.password, input_data.password);	
+	strcpy(data.password, input_data.password);
 
 	strcpy(data.information, "请求注册");
+
+	printf("age:%s, sex: %s\n", data.age, data.sex);
+
+	
 
 	while(1)
 	{
