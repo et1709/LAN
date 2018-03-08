@@ -59,7 +59,7 @@ int handler_receive(void)
 			switch(receive_data.order)
 			{
 				case 11:
-					printf("   注册成功, 您的账号是: %d\n", receive_data.friend_id);
+					printf("   注册成功, 您的账号是: %s\n", receive_data.mine_id);
 					receive_data.order = -1;
 					break;
 				case 10:
@@ -75,7 +75,7 @@ int handler_receive(void)
 					receive_data.order = -1;
 					break;
 				case 33:
-					printf("   收到%s(%d)发来的消息: %s\n",
+					printf("   收到%s(%s)发来的消息: %s\n",
 						  	receive_data.friend_nickname, receive_data.friend_id,
 						  	receive_data.information);
 					receive_data.order = -1;
@@ -140,9 +140,17 @@ void *_send(void * arg)
 				printf("发送消息失败!\n");
 			}
 			else{
-				printf("发送了%d个消息!\n", cnt);
-				printf("发送请求(%d), 消息(%s)成功!\n", 
-						send_data.order, send_data.information);			
+				printf("成功发送了%d个字节消息!\n", cnt);
+				printf("消息包内容是:\n");
+				printf("order:%d, information: %s",
+					    send_data.order, send_data.information);
+				printf("nickname:%s, mine_id: %s",
+					    send_data.nickname, send_data.mine_id);
+				printf("nickname:%s, mine_id: %s",
+					    send_data.age, send_data.sex);
+				printf("friend_nickname:%s, friend_id: %s",
+					    send_data.friend_nickname, send_data.friend_id);
+				printf("send_msg_time:%s", send_data.send_msg_time);			
 			}		
 		}
 	}	
@@ -333,10 +341,10 @@ int choose_function(void)
 			
 			break;
 		case 3:
-			
+			find_friends();
 			break;
 		case 4:
-			
+			//add_friend();
 			break;
 		case 5:
 			
@@ -356,24 +364,79 @@ int choose_function(void)
 	}
 }
 
+/*
+//添加好友
+void add_friend(void)
+{
+	AGREEMENT data;
+	char ch;
+	
+	printf("请输入您好友的账号:\n");
+	while((ch = getchar() != '\n' && ch != EOF));
+	fgets(data.friend_id, 6, stdin);
+	strcpy(data.information, "查找好友");
+	while(1)
+	{
+		//消息入队
+		if(false == enqueue(pSend_queue, data))
+		{
+			printf("消息入队失败!");
+			continue;
+		}
+		else {
+			break;
+		}
+	}
+}
+*/
+
+//查找好友
+int find_friends(void)
+{
+	AGREEMENT data;
+	char ch;
+	
+	printf("请输入您好友的账号:\n");
+	while((ch = getchar() != '\n' && ch != EOF));
+	fgets(data.friend_id, 6, stdin);
+	strcpy(data.information, "查找好友");
+	while(1)
+	{
+		//消息入队
+		if(false == enqueue(pSend_queue, data))
+		{
+			printf("消息入队失败!");
+			continue;
+		}
+		else {
+			break;
+		}
+	}	
+	return 0;
+}
+
+
 //单聊
 int single_chat(void)
 {
 	AGREEMENT data;
 	int cnt;
+	char ch;
 
 	while(1)
 	{			
 		memset(&data, 0, sizeof(data));
 		printf("请问你要跟哪位好友(好友ID)聊天? (按0退出单聊)");
-		scanf("%d", &data.mine_id);
+		while((ch = getchar() != '\n' && ch != EOF));
+		fgets(data.mine_id, 6, stdin);
 
-		if(0 == data.mine_id)
+		if(0 == strcmp( data.mine_id, "0"))
 		{
 			break;
 		}		
 		printf("你要发送的消息内容(50字以内):\n");
-		gets(data.information);
+		while((ch = getchar() != '\n' && ch != EOF));
+		fgets(data.information, 100, stdin);
 
 		while(1)
 		{
@@ -416,6 +479,7 @@ int log_in_menu(int sockfd)
 			return -1;
 		case 1:
 			//注册账号
+			
 			_register(sockfd);
 			if(-1 == rt)
 			{
@@ -441,8 +505,17 @@ int _register(int sockfd)
 {
 	AGREEMENT data;
 	int cnt;
+	struct information input_data;
+
+	memset(&input_data, 0, sizeof(input_data));
 	memset(&data, 0, sizeof(data));
+
+	register_func( &input_data);
+	
 	data.order = 1;
+	strcpy(data.mine_id, input_data.login_account);
+	strcpy(data.nickname, input_data.nickname);
+	strcpy(data.password, input_data.password);	
 
 	strcpy(data.information, "请求注册");
 
@@ -475,14 +548,20 @@ int _register(int sockfd)
 	return 0;
 }
 
-
 //登陆
 int log_in(int sockfd)
 {
 	AGREEMENT data;
 	int cnt;
+	struct information input_data;
+	memset(&input_data, 0, sizeof(input_data));
 	memset(&data, 0, sizeof(data));
+	
+	login_information(&input_data);
+
 	data.order = 2;
+	strcpy(data.mine_id, input_data.login_account);
+	strcpy(data.password, input_data.login_password);		
 	strcpy(data.information, "请求登陆");
 
 	while(1)

@@ -10,7 +10,7 @@
 #include <sys/socket.h>
 #include <string.h>
 
-#include "registered"
+#include "registered.h"
 #include "connect_server.h"
 #include "protocol.h"
 #include "show_menu.h"
@@ -60,6 +60,12 @@ int _register(int sockfd);
 //µÇÂ½
 int log_in(int sockfd);
 int single_chat(void);
+//²éÕÒºÃÓÑ
+int find_friends(void);
+//µ¥ÁÄ
+int single_chat(void);
+
+
 
 
 
