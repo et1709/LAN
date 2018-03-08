@@ -60,6 +60,12 @@ int _register(int sockfd);
 //µÇÂ½
 int log_in(int sockfd);
 int single_chat(void);
+//²éÕÒºÃÓÑ
+int find_friends(void);
+//µ¥ÁÄ
+int single_chat(void);
+
+
 
 
 
