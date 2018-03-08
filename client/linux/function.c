@@ -33,6 +33,7 @@ void function(int sockfd)
 	{
 		login_menu();
 		log_in_menu(sockfd);
+		usleep(80000);
 		if(LoginFlag)
 		{
 			break;
@@ -229,7 +230,7 @@ void *receive(void *arg)
 			sleep(1);
 			continue;
 		}
-
+/*
 		if (FD_ISSET(udp_socket, &udp_rset))
 		{
 			memset(udp_rdbuf, 0, sizeof(udp_rdbuf));
@@ -239,7 +240,7 @@ void *receive(void *arg)
 				printf("接收到UDP服务器消息: %s\n", udp_rdbuf);
 			}			
 		}
-
+*/
 		if (FD_ISSET(sockfd, &tcp_rset))
 		{		
 			memset(&recv_data, 0, recv_data_len);		
@@ -492,16 +493,17 @@ int single_chat(void)
 int log_in_menu(int sockfd)
 {
 	int num;
-	int rt;
+	int rt, ch;
 	while(1)
 	{		
-		while(scanf("%d", &num) <= 0)
+		while(scanf("%d", &num) < 0)
 		{
 			printf("输入错误, 请重新输入!\n");
 		}
 		if(num > 3 || num < 0)
 		{
 			printf("抱歉,没有这个选项, 请重新输入!\n");
+			while((ch = getchar() != '\n') && (ch != EOF));
 		}
 		else {
 			break;
@@ -511,9 +513,9 @@ int log_in_menu(int sockfd)
 	{
 		case 0: 
 			printf("感谢使用, 88~~\n");
-			return -1;
+			exit(0);
 		case 1:			
-			_register(sockfd);     //注册账号			
+			_register(sockfd);     //注册账号	
 			usleep(8000);
 			break;
 		case 2:
