@@ -21,7 +21,8 @@ callback backupdat;
 
 sqlite3 *db;
 int creatNum = 0;
-char string[10];
+char PasswdStr[10];
+char NameStr[10];
 
 /*******************************************************************************
  * 名称: 
