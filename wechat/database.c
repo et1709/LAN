@@ -8,8 +8,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sqlite3.h>
 
-#include "sqlite3.h"
 #include "database.h"
 
 /******************************外部全局变量声明********************************/
