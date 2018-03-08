@@ -107,24 +107,23 @@ int register_func(struct information *info)
 
 	
 	//选择性别
-	
+	while(((ch = getchar()) != '\n') && (ch != EOF));
 	printf("请选择性别:\n");
 	printf("男(m/M)      or      女(f/F)\n");
 	while(1)
 	{
 		
 		info->sex[0] = getchar();
-		while(((ch = getchar()) != '\n') && (ch != EOF));
+		
 		printf("info->sex[0] = %c\n", info->sex[0]);
 		
 		if(('m' != info->sex[0]) && ('M' != info->sex[0]) 
 			&& ('f' != info->sex[0]) && ('F' != info->sex[0]))
 		{
 			printf("输入错误，请重新输入!\n");
-			
+			while(((ch = getchar()) != '\n') && (ch != EOF));
 			continue;
-		}
-		
+		}		
 		break;
 	}
 	info->sex[1] = '\0';

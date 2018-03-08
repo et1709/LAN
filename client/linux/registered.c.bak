@@ -117,8 +117,8 @@ int register_func(struct information *info)
 		while(((ch = getchar()) != '\n') && (ch != EOF));
 		printf("info->sex[0] = %c\n", info->sex[0]);
 		
-		if(('m' != info->sex[0]) || ('M' != info->sex[0]) 
-			|| ('f' != info->sex[0]) || ('F' != info->sex[0]))
+		if(('m' != info->sex[0]) && ('M' != info->sex[0]) 
+			&& ('f' != info->sex[0]) && ('F' != info->sex[0]))
 		{
 			printf("输入错误，请重新输入!\n");
 			
