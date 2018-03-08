@@ -14,13 +14,13 @@ void login_func(AGREEMENT *data, struct information *info, int flag)
 		strcpy(data->mine_id, info->id);
 		strcpy(buffer, info->id);
 		printf("=======data->id %s\n", data->mine_id);
-		while((ch = getchar()) != '\n' && ch != EOF);
+		setbuf(stdin, NULL);
 		
 		printf("请输入登陆密码：\n");
 		fgets(info->password, 6, stdin);
 		strcpy(data->password, info->password);
 		printf("=======data->password %s\n", data->password);
-		//setbuf(stdin, NULL);
+		setbuf(stdin, NULL);
 	}
 	else if(flag >= 0)
 	{

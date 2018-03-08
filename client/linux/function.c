@@ -37,6 +37,7 @@ void function(int sockfd)
 		{
 			break;
 		}
+		printf("LoginFlag = %d\n", LoginFlag);
 	}	
 	while(1)
 	{		
@@ -90,7 +91,7 @@ int handler_receive(void *pSockfd)
 				case 20:
 					printf("   登陆失败! 失败原因: %s\n", receive_data.information);
 					printf("   请重新登陆!\n");
-					log_in(sockfd);
+					//log_in(sockfd);
 					receive_data.order = -1;
 					break;
 				case 33:
