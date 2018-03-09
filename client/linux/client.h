@@ -9,7 +9,7 @@
 
 
 #define SVR_PORT 8888
-#define BCAST "192.168.199.255"
+#define BCAST "192.168.16.255"
 
 
 

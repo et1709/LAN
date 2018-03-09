@@ -5,6 +5,8 @@ INFORMATION_QUEUE* receive_queue;
 
 extern int udp_socket;
 int LoginFlag = 0;
+char my_account[6];
+
 
 pthread_mutex_t mutex; //= PTHREAD_MUTEX_INITIALIZER;    //互斥锁
 //pthread_cond_t cond;      //条件变量
@@ -23,12 +25,6 @@ void function(int sockfd)
 
 	// 初始化互斥锁
 	pthread_mutex_init(&mutex, NULL);
-
-	/*
-	PARAMETER  parameter;
-	parameter.callBack = handler_receive;
-	parameter.sockfd = sockfd;
-	*/
 	
 	pthread_create(&send_thread, NULL, _send, (void *)sockfd);
 	pthread_create(&receive_thread, NULL, receive, (void *)sockfd);
@@ -426,6 +422,7 @@ void add_friend(void)
 	while((ch = getchar() != '\n' && ch != EOF));
 	fgets(data.friend_id, 6, stdin);
 	strcpy(data.information, "添加好友");
+	strcpy(data.mine_id, my_account);
 	while(1)
 	{
 		//消息入队
@@ -452,6 +449,7 @@ int find_friends(void)
 	while((ch = getchar() != '\n' && ch != EOF));
 	fgets(data.friend_id, 6, stdin);
 	strcpy(data.information, "查找好友");
+	strcpy(data.mine_id, my_account);
 	
 	while(1)
 	{
@@ -630,7 +628,9 @@ int log_in(int sockfd)
 	strcpy(data.mine_id, input_data.id);
 	strcpy(data.password, input_data.password);
 	strcpy(data.information, "请求登陆");
-
+	
+	strcpy(my_account, data.mine_id);
+	
 	while(1)
 	{
 		//消息入队
