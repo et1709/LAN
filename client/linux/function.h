@@ -18,16 +18,6 @@
 #include "show_menu.h"
 
 
-
-
-/*
-typedef struct  par
-{
-	int (*callBack)(void);
-	int sockfd;
-}PARAMETER;
-*/
-
 typedef struct node
 {
 	AGREEMENT data;
@@ -39,8 +29,6 @@ typedef struct head
 	QUEUE_NODE* front;
 	QUEUE_NODE* rear;
 }INFORMATION_QUEUE;
-
-
 
 
 void function(int sockfd);
@@ -69,8 +57,10 @@ int single_chat(void);
 int find_friends(void);
 //单聊
 int single_chat(void);
-void add_friend(void);          //添加好友
-void main_menu(void);            //主菜单
+void add_friend(void);                 //添加好友
+void main_menu(void);                  //主菜单
+void find_friend_list(void);        //查找好友列表
+
 
 
 

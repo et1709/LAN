@@ -4,6 +4,7 @@
 void login_func(struct information *info)
 {
 	char ch;
+	char temp_buf[10];
 	while(((ch = getchar()) != '\n') && (ch != EOF));
 	printf("请输入您的账号(5位数):\n");
 	gets(info->id);	
