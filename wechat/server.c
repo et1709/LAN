@@ -1,29 +1,30 @@
 #include "server.h"
 
 struct info infos[MAXBACKLOG];
-struct ClientInfo cliInfos[MAXBACKLOG]; //已登录的客户信息
-pthread_mutex_t mutex;                  //互斥锁;
-int cliNum = 0;                             //客户端数
+struct ClientInfo cliInfos[MAXBACKLOG];			//已登录的客户信息
+int cliNum = 0;									//客户端数
+pthread_mutex_t mutex;							//互斥锁;
+
 
 int main()
 {	
 	struct TcpInit tcp_init;
 		
-	tcp_server_init(&tcp_init);//TCPP 服务器初始化
+	tcp_server_init(&tcp_init);					//TCP 服务器初始化
 
-	creat_database();          //创建数据库
+	creat_database();							//创建数据库
 
 	while(1)
 	{
 		int index;
 
-		udp_server_init(index);     //UDP 服务器初始化,循环监听
+		udp_server_init(index);					//UDP 服务器初始化,循环监听
 
 		//等待客户端连接
 		tcp_init.tcp_connfd = uin_accept(tcp_init.tcp_socket, &(tcp_init.tcp_cltaddr));
 		if(tcp_init.tcp_connfd == -1)
 		{
-			printf("连接失败\n");
+			printf("客户端连接失败\n");
 			continue;
 		}
 		
@@ -32,15 +33,8 @@ int main()
 		infos[index].tcp_connfd = tcp_init.tcp_connfd;
 		infos[index].tcp_cltaddr = tcp_init.tcp_cltaddr;
 		
-		//客户端连接线程
-		pthread_create(&infos[index].thread, NULL,
-					tcp_server_handle, (void *)index);
-		//接收消息线程
-		/*pthread_create(&infos[index].thread, NULL,
-						receive_msg, (void *)index);*/
-		//发送消息线程
-		/*pthread_create(&infos[index].thread, NULL,
-						send_msg, (void *)index);*/
+		//处理客户端请求线程
+		pthread_create(&infos[index].thread, NULL,tcp_server_handle, (void *)index);
 	}
 	
 	if(tcp_server_close(&tcp_init) == 0)  //TCP 服务器关闭连接

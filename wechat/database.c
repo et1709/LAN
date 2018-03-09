@@ -4,13 +4,8 @@
 -* 时间： 
 -* 版本：
 -* Includes  =================================================================*/
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sqlite3.h>
-
 #include "database.h"
+#include "server.h"
 
 /******************************外部全局变量声明********************************/
 typedef struct {
@@ -21,7 +16,8 @@ callback backupdat;
 
 sqlite3 *db;
 int creatNum = 0;
-char string[10];
+char PasswdStr[10];
+char NameStr[10];
 
 /*******************************************************************************
  * 名称: 
@@ -193,11 +189,10 @@ int add_to_database(char *qqID, char *qqName, char *qqPaswd, char *p_age, char *
  * 返回: 无
  * 说明: 无
 *******************************************************************************/
-int get_user_table_callback(void *data, int col_count, char **col_values, char **col_Name)
+int get_userPasswd_callback(void *data, int col_count, char **col_values, char **col_Name)
 {
-	sprintf(string, "%s", col_values[2]);
-	// creatNum = strtoul(string, NULL, 10);;
-	// printf("%d\n", creatNum);
+	memset(&PasswdStr, 0, sizeof(PasswdStr));
+	sprintf(PasswdStr, "%s", col_values[2]);
 	
 	return 0;
 }
@@ -209,7 +204,7 @@ int get_user_table_callback(void *data, int col_count, char **col_values, char *
  * 返回: 无
  * 说明: 无
 *******************************************************************************/
-char *search_user_table(char *qqID)
+char *search_user_table_Passwd(char *qqID)
 {
 	int err;
 	char *pErrMsg = 0;
@@ -224,18 +219,126 @@ char *search_user_table(char *qqID)
 	
 	memset(&sql, 0, sizeof(sql));
 	sprintf(sql, "select * from user_table where qqID = '%s';", qqID);
-	if (SQLITE_OK != sqlite3_exec(db, sql, get_user_table_callback, NULL, &pErrMsg)) {
+	if (SQLITE_OK != sqlite3_exec(db, sql, get_userPasswd_callback, NULL, &pErrMsg)) {
 
 		// 关闭数据库
 		sqlite3_close(db);
 		return NULL;
 	}
 	
-	return string;
+	return PasswdStr;
+}
+
+/*******************************************************************************
+ * 名称: 
+ * 功能: 
+ * 形参: 无
+ * 返回: 无
+ * 说明: 无
+*******************************************************************************/
+int get_userQQname_callback(void *data, int col_count, char **col_values, char **col_Name)
+{
+	memset(&NameStr, 0, sizeof(NameStr));
+	sprintf(NameStr, "%s", col_values[1]);
+	
+	return 0;
+}
+
+/*******************************************************************************
+ * 名称: 
+ * 功能: 
+ * 形参: 无
+ * 返回: 无
+ * 说明: 无
+*******************************************************************************/
+char *search_user_table_qqName(char *qqID)
+{
+	int err;
+	char *pErrMsg = 0;
+	char sql[100];
+	 
+	// 创建一个数据库
+	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {
+	
+		printf("创建数据库 %s 失败(%s)\n", "database.db", sqlite3_errstr(err));
+		return NULL;
+	}
+	
+	memset(&sql, 0, sizeof(sql));
+	sprintf(sql, "select * from user_table where qqID = '%s';", qqID);
+	if (SQLITE_OK != sqlite3_exec(db, sql, get_userQQname_callback, NULL, &pErrMsg)) {
+
+		// 关闭数据库
+		sqlite3_close(db);
+		return NULL;
+	}
+	
+	return NameStr;
 }
 
 
+/*******************************************************************************
+ * 名称: 
+ * 功能: 添加好友的时候创建一个与好友的聊天记录 table
+ * 形参: 无
+ * 返回: 无
+ * 说明: chatName：朋友的昵称
+*******************************************************************************/
+int create_friendchat_table(char *chatName)
+{
+	int err;
+	char sql[100];
+	
+	memset(&sql, 0, sizeof(sql));
+	sprintf(sql, "create table %s_chatTable(qqID TEXT, qqName TEXT, qqChat TEXT, qqTime TEXT)", chatName);
+	// 创建一个数据库
+	if (SQLITE_OK != sqlite3_exec(db, sql, NULL, NULL, NULL)) {
 
+		// 关闭数据库
+		return -1;
+	}
+	
+	return 0;	// OK
+}
+
+/*******************************************************************************
+ * 名称: 
+ * 功能: 添加数据到 userName 用户数据库的 qqlist_table 列表
+ * 形参: 无
+ * 返回: 无
+ * 说明: 无 
+*******************************************************************************/
+int add_to_qqlist_table(char *userName, char *qqID, char *qqName, char *p_age, char *q_sex)
+{
+	int err;
+	char sql[100];
+	char str[100];
+	
+	memset(&str, 0, sizeof(str));
+	sprintf(str, "%s.db", userName);
+	// 创建一个数据库
+	if (SQLITE_OK != (err = sqlite3_open(str, &db))) {
+	
+		printf("创建数据库 %s 失败(%s)\n", str, sqlite3_errstr(err));
+		return -1;
+	}
+	
+	memset(&sql, 0, sizeof(sql));
+	sprintf(sql, "insert into qqlist_table values('%s', '%s', '%s', '%s')", qqID, qqName, p_age, q_sex);
+	if (SQLITE_OK != sqlite3_exec(db, sql, NULL, NULL, NULL)) {
+
+		// 关闭数据库
+		sqlite3_close(db);
+		return -1;
+	}
+	
+	create_friendchat_table(qqName);
+
+	// 关闭数据库
+	sqlite3_close(db);
+	
+	return 0;	// OK
+}
 
 
 

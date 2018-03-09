@@ -14,15 +14,17 @@
 
 
 /******************************全局变量声明************************************/
-extern sqlite3 *db;
 extern int creatNum;
-extern char string[10];
+extern char PasswdStr[10];
+extern char NameStr[10];
 
 /******************************函数声明****************************************/
 int creat_database(void);
 int add_to_database(char *qqID, char *qqName, char *qqPaswd, char *p_age, char *q_sex);
-char *search_user_table(char *qqID);
-
+char *search_user_table_Passwd(char *qqID);
+char *search_user_table_qqName(char *qqID);
+int create_friendchat_table(char *chatName);
+int add_to_qqlist_table(char *userName, char *qqID, char *qqName, char *p_age, char *q_sex);
 
 
 #endif

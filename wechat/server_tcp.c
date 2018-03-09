@@ -1,7 +1,13 @@
 #include "server.h"
 
 
-//UICI TCP 服务器初始化
+/*-------------------------------------------------------
+|	函数名：tcp_server_init
+|	功能  ：使用UICI接口进行TCP套接字创建
+|	输入  ：struct TcpInit *tcp_init
+|	输出  ：-1——失败； 0——成功
+|	说明  ：
+-------------------------------------------------------*/
 int tcp_server_init(struct TcpInit *tcp_init)
 {
 	tcp_init->port = SOCKET_PORT;
@@ -16,11 +22,17 @@ int tcp_server_init(struct TcpInit *tcp_init)
 }
 
 
-//TCP 服务器处理客户端连接请求的线程
+/*-------------------------------------------------------
+|	函数名：tcp_server_handle
+|	功能  ：处理客户端的请求
+|	输入  ：线程下标index
+|	输出  ：
+|	说明  ：处理请求的线程
+-------------------------------------------------------*/
 void *tcp_server_handle(void *arg)
 {
-	char *cltip = NULL;           //建立客户端端 IP
-	in_port_t cltport;            //建立客户端端口号
+	char *cltip = NULL;				//建立客户端端 IP
+	in_port_t cltport;				//建立客户端端口号
 	char buf_r[128] = "";
 	char buf_w[128] = "Hello client";
 	int connect_status;
@@ -36,7 +48,8 @@ void *tcp_server_handle(void *arg)
 	
 	while(1)
 	{
-		memset(buf_r, 0 ,sizeof buf_r);//清空缓冲区
+		memset(buf_r, 0 ,sizeof buf_r);		//清空缓冲区
+
 		connect_status = r_recv(connfd, buf_r, sizeof buf_r);
 		printf("\n接收到客户端TCP消息：%s\n", buf_r);
 		if(connect_status == -1)
@@ -59,68 +72,32 @@ void *tcp_server_handle(void *arg)
 			}
 		}
 		
-		// 应答
+		//判断客户端发来的口令
 		if(strcmp(buf_r, "Hello server") == 0)
 		{
-			//connect_status = uin_sendto(infos[index].tcp_connfd, buf_w, strlen(buf_w), &(infos[index].tcp_cltaddr));
 			connect_status = r_send(infos[index].tcp_connfd, buf_w, strlen(buf_w));
 			if (connect_status == -1)
 			{
 				printf("发送失败\n");
-				//goto _out;
+				goto _out;
 			}
 			else
 			{
 				printf("发送成功：%s\n", buf_w);
-				memset(buf_r, 0 ,sizeof buf_r);//清空缓冲区
 			}
 		}	
 
-		cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
-
-		if((read_len = r_recv(connfd, (void *)packet, sizeof (AGREEMENT))) > 0)
+		while(1)
 		{
-			cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
-			handle_request(packet, index);             //处理客户端请求
-			printf("接收到（%s）的消息：%s\n", inet_ntoa(infos[index].tcp_cltaddr.sin_addr), 
-													packet->information);
-		}
-			//target_cltaddr = handle_request(packet, index);  //处理客户端请求
+			//接收客户端发送过来的数据包
+			if((read_len = r_recv(connfd, (void *)packet, sizeof (AGREEMENT))) > 0)
+			{
+				//cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
+				printf("接收到（%s）的消息：%d %s %s\n", inet_ntoa(infos[index].tcp_cltaddr.sin_addr), 
+					packet->order, packet->information, packet->mine_id);
 
-	}
-	_out:
-	// 释放线程信息空间
-	memset(&infos[index], 0, sizeof (struct info));
-	// 关闭连接描述符
-	if (connfd != -1)
-	{
-		while ((-1 == close(connfd)) && (EINTR == errno));
-	}
-}
-
-
-//接收客户端消息线程
-void *receive_msg(void *arg)
-{
-	int read_len = 0;
-	int index = (int)arg;
-	int connfd = infos[index].tcp_connfd;
-	AGREEMENT *packet = &(infos[index].dataPacket);
-	char buf_r[128] = "";
-	char buf_w[128] = "";
-	int connect_status;
-	
-	while(1)
-	{
-		
-		cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
-
-		if((read_len = r_recv(connfd, (void *)packet, sizeof (AGREEMENT))) > 0)
-		{
-			cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
-			handle_request(packet, index);             //处理客户端请求
-			printf("接收到（%s）的消息：%s\n", inet_ntoa(infos[index].tcp_cltaddr.sin_addr), 
-													packet->information);
+				handle_request(packet, index);			//解析数据包，处理客户端不同的请求
+			}
 		}
 	}
 
@@ -135,25 +112,13 @@ _out:
 }
 
 
-//向客户端发送消息线程
-void *send_msg(void *arg)
-{
-	int index = (int)arg;
-	int connfd = infos[index].tcp_connfd;
-	struct sockaddr_in target_cltaddr;
-	AGREEMENT *packet = &(infos[index].dataPacket);
-	
-	while(1)
-	{
-		target_cltaddr = handle_request(packet, index);  //处理客户端请求
-
-		//发送消息
-		uin_sendto(infos[index].tcp_connfd, (void *)packet, sizeof (AGREEMENT), &target_cltaddr);
-	}
-}
-
-
-// 在 infos 数组中查找空位
+/*-------------------------------------------------------
+|	函数名：get_first
+|	功能  ：在 infos 数组中查找空位
+|	输入  ：
+|	输出  ：
+|	说明  ：i——成功  -1——失败
+-------------------------------------------------------*/
 int get_first()
 {
 	int i;
@@ -164,6 +129,5 @@ int get_first()
 			return i;
 		}
 	}
-	
 	return -1;
 }

@@ -16,13 +16,19 @@
 #include "uinsock.h"
 #include "protocol.h"
 #include "database.h"
+#include "sqlite3.h"
 
-/************宏定义************/
-#define SOCKET_PORT 8888 //端口号
-#define MAXBACKLOG  50   //最大连接数量
-#define SIZE_SHMADD 2048 //共享内存的大小
+/**************************** 宏定义 ********************************/
+#define SOCKET_PORT		8888 //端口号
+#define MAXBACKLOG		50   //最大连接数量
 
-/************结构体声明************/
+#define ID_LEN			6    //账号长度
+#define NICKNAME_LEN	11   //昵称长度
+#define PASSWORD_LEN	6    //密码长度
+#define AGE_LEN			4    //年龄长度
+#define SEX_LEN			2    //性别长度
+
+/************************** 结构体声明 ******************************/
 struct info
 {
 	int tcp_connfd;                 //连接描述符
@@ -41,32 +47,31 @@ struct TcpInit
 
 struct ClientInfo
 {
-	struct sockaddr_in tcp_cltaddr; //客户端套接字地址
-	int id;
-	char nickname[20];
+	int  client_connfd; //客户端套接字地址
+	char id[ID_LEN];				//账号
+	char nickname[NICKNAME_LEN];	//昵称
 };
 
-/************函数声明************/
-//**********UDP**********
+/*************************** 函数声明 *******************************/
+//------------UDP---------------
 int udp_server_init(int index);
-//**********TCP**********
+//------------TCP---------------
 int tcp_server_init(struct TcpInit *tcp_init);
 int tcp_server_close(struct TcpInit *tcp_init);
-//**********线程**********
+//------------线程---------------
 void *tcp_server_handle(void *arg);
-void *receive_msg(void *arg);
-void *send_msg(void *arg);
 int get_first();
-//**********Handle_request**********
+//------------请求处理函数---------------
 struct sockaddr_in handle_request(AGREEMENT *packet, int index);
 void login_req(AGREEMENT *packet, int index);
-struct sockaddr_in singleChat_req(AGREEMENT *packet);
+void register_req(AGREEMENT *packet, int index);
+void singleChat_req(AGREEMENT *packet, int index);
 
-/************外部变量声明************/
+/************************* 外部变量声明 *****************************/
 extern struct info infos[MAXBACKLOG];
-extern struct ClientInfo cliInfos[MAXBACKLOG]; //已登录的客户信息
-extern pthread_mutex_t mutex;  //互斥锁;
-extern int cliNum;             //客户端数
+extern struct ClientInfo cliInfos[MAXBACKLOG];	//已登录的客户信息
+extern pthread_mutex_t mutex;					//互斥锁;
+extern int cliNum;								//客户端数
 
 
 #endif
