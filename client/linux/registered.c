@@ -12,28 +12,35 @@ int register_func(struct information *info)
 	// 1: 创建账号
 	while((ch = getchar() != '\n') && (ch != EOF));
 	printf("==================注册输入阶段:===============\n");
-	printf("创建账号(5位数):\n");	
-	i = 0;
+	printf("创建账号(5位数):\n");
 	while(1)
-	{				
-		info->id[i] = getchar();
-		if('\n' == info->id[i] && i < 5)
+	{
+		fgets(tem_buf, 8, stdin);			
+		len = strlen(tem_buf);
+		printf("tem_buf = %s\n", tem_buf);
+		printf("len = %d\n", len);
+		if(len > 6)
 		{
-			i = 0;
-			printf("您输入的位数不够,请重新输入!\n");
-			memset(info->id, 0, sizeof(info->id));
+			printf("您输入的位数太多,请重新输入!\n");
+			memset(tem_buf, 0, sizeof(tem_buf));
+			while((ch = getchar() != '\n') && (ch != EOF));
 			continue;
 		}
-		else if(5 == i)
+		else if( len < 5 )
 		{
-			break;
+			printf("您输入的位数太少,请重新输入!\n");
+			memset(tem_buf, 0, sizeof(tem_buf));
+			continue;
 		}
-		i++;
+		else
+		{
+			strcpy(info->id, tem_buf);
+			break;
+		}		
 	}
-	info->id[i] = '\0';
 	printf("login_account = %s\n", info->id);
-	
-		
+
+			
 	// 2: 创建密码
 	//while((ch = getchar() != '\n') && (ch != EOF));
 	printf("请输入需要创建的密码(3~5位数):\n");
@@ -46,14 +53,14 @@ int register_func(struct information *info)
 		
 		printf("tem_buf = %s\n", tem_buf);
 		printf("len = %d\n", len);
-		if(len > 5)
+		if(len > 6)
 		{
 			printf("您输入的位数太多,请重新输入!\n");
 			memset(tem_buf, 0, sizeof(tem_buf));
 			while((ch = getchar() != '\n') && (ch != EOF));
 			continue;
 		}
-		else if( len < 3 )
+		else if( len < 4 )
 		{
 			printf("您输入的位数太少,请重新输入!\n");
 			memset(tem_buf, 0, sizeof(tem_buf));
@@ -69,13 +76,13 @@ int register_func(struct information *info)
 	
 
 	// 3: 创建昵称	
-	printf("请输入需要创建的呢称(10位以内英文字母):\n");	
+	printf("请输入需要创建的呢称(10位以内英文字母):\n");
 	while(1)
 	{
 		
 		fgets(tem_buf, 12, stdin);
 		len = strlen(tem_buf);
-		if(len > 10)
+		if(len > 11)
 		{
 			printf("您输入的位数太多,请重新输入!\n");
 			memset(tem_buf, 0, sizeof(tem_buf));
@@ -95,16 +102,20 @@ int register_func(struct information *info)
 	printf("请输入你的年龄(3位数以内):\n");
 	while(1)
 	{
-		fgets(tem_buf, 5, stdin);
+		fgets(tem_buf, 6, stdin);
 		len = strlen(tem_buf);
-		if(len > 3)
+		
+		printf("tem_buf = %s\n", tem_buf);
+		printf("len = %d\n", len);
+		
+		if(len > 4)
 		{
 			printf("您输入的位数太多,请重新输入!\n");
 			memset(tem_buf, 0, sizeof(tem_buf));
 			while((ch = getchar() != '\n') && (ch != EOF));
 			continue;
 		}
-		else
+		else if('\n' != tem_buf[0])
 		{
 			strcpy(info->age, tem_buf);
 			break;
