@@ -7,7 +7,7 @@
 *显示登陆，注册界面
 */
 void login_menu(void);
-void main_menu(void);
+void show_main_menu(void);
 
 
 #endif
