@@ -1,5 +1,2 @@
----- init_queue Matches (4 in 2 files) ----
-Function_win.c (d:\luo\two\8_linux阶段项目\code\client\win):	pSend_queue = init_queue();
-Function_win.c (d:\luo\two\8_linux阶段项目\code\client\win):	receive_queue = init_queue();
-Function_win.c (d:\luo\two\8_linux阶段项目\code\client\win):INFORMATION_QUEUE *init_queue(void)
-Function_win.h (d:\luo\two\8_linux阶段项目\code\client\win):INFORMATION_QUEUE *init_queue(void);
+---- cond Matches (1 in 1 files) ----
+Function.c (d:\luo\two\8_linux阶段项目\code\client\linux):pthread_cond_t cond;      //条件变量

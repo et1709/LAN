@@ -5,8 +5,10 @@ INFORMATION_QUEUE* receive_queue;
 
 extern int udp_socket;
 int LoginFlag = 0;
-int login_mark = 3;
-char buffer[20];
+
+pthread_mutex_t mutex; //= PTHREAD_MUTEX_INITIALIZER;    //互斥锁
+//pthread_cond_t cond;      //条件变量
+
 
 //功能选择
 void function(int sockfd)
@@ -14,9 +16,13 @@ void function(int sockfd)
 	int rt;
 	pthread_t send_thread, receive_thread;
 	pthread_t handler_receive_thread, handler_send_thread;
-	
+
+	//初始化队列
 	pSend_queue = init_queue();
 	receive_queue = init_queue();
+
+	// 初始化互斥锁
+	pthread_mutex_init(&mutex, NULL);
 
 	/*
 	PARAMETER  parameter;
@@ -33,17 +39,23 @@ void function(int sockfd)
 	{
 		login_menu();
 		log_in_menu(sockfd);
-		usleep(80000);
+		sleep(1);
+
+		// 加互斥锁	
+		pthread_mutex_lock(&mutex);
 		if(LoginFlag)
 		{
+			// 解锁	
+			pthread_mutex_unlock(&mutex);
 			break;
 		}
-		printf("LoginFlag = %d\n", LoginFlag);
+		pthread_mutex_unlock(&mutex);
+		//printf("LoginFlag = %d\n", LoginFlag);
 	}	
 	while(1)
 	{		
 		//进入主菜单
-		main_menu();		
+		main_menu();
 	}	
 }
 
@@ -59,7 +71,7 @@ void main_menu(void)
 * 33:收到单聊信息,  44:查找到好友  40:查找好友失败
 * 66:添加好友成功,  60:添加好友失败
 */
-int handler_receive(void *pSockfd)
+void * handler_receive(void *pSockfd)
 {
 	AGREEMENT receive_data;
 	int sockfd = (int)pSockfd;
@@ -71,7 +83,7 @@ int handler_receive(void *pSockfd)
 			if(false == dequeue(receive_queue, &receive_data))
 			{
 				printf("消息出队队失败!");
-				return -1;
+				return;
 			}
 			switch(receive_data.order)
 			{
@@ -86,7 +98,12 @@ int handler_receive(void *pSockfd)
 					break;
 				case 22:
 					printf("   登陆成功!\n");
+
+					// 加互斥锁	
+					pthread_mutex_lock(&mutex);
 					LoginFlag = 1;
+					// 解锁	
+					pthread_mutex_unlock(&mutex);					
 					receive_data.order = -1;
 					break;
 				case 20:
@@ -404,7 +421,7 @@ void add_friend(void)
 	AGREEMENT data;
 	char ch;
 	memset(&data, 0, sizeof(data));
-	data.order = 4;
+	data.order = 6;
 	printf("请输入您好友的账号:\n");
 	while((ch = getchar() != '\n' && ch != EOF));
 	fgets(data.friend_id, 6, stdin);
@@ -430,7 +447,7 @@ int find_friends(void)
 	char ch;
 
 	memset(&data, 0, sizeof(data));
-	data.order = 3;
+	data.order = 4;
 	printf("请输入您好友的账号:\n");
 	while((ch = getchar() != '\n' && ch != EOF));
 	fgets(data.friend_id, 6, stdin);
@@ -455,23 +472,48 @@ int find_friends(void)
 int single_chat(void)
 {
 	AGREEMENT data;
-	int cnt;
+	int cnt, i, flag;
 	char ch;
 
 	while(1)
 	{			
 		memset(&data, 0, sizeof(data));
-		data.order = 1;
-		printf("请问你要跟哪位好友(好友ID)聊天? (按0退出单聊)");
+		data.order = 3;
 		while((ch = getchar() != '\n' && ch != EOF));
-		fgets(data.mine_id, 6, stdin);
-
-		if(0 == strcmp( data.mine_id, "0"))
+		printf("请问你要跟哪位好友(好友ID)聊天? (按0退出单聊)");		
+		//fgets(data.friend_id, 6, stdin);
+		i = 0;
+		while(1)
+		{
+			data.friend_id[i] = getchar();
+			printf("data.friend_id[%d] = %c\n", i, data.friend_id[i]);
+			if( '0' == (data.friend_id[i]))
+			{
+				flag = 1;
+				break;
+			}
+			if('\n' == data.friend_id[i] && i < 5)
+			{
+				i = 0;
+				printf("您输入的位数不够,请重新输入!\n");
+				memset(data.friend_id, 0, sizeof(data.friend_id));
+				continue;
+			}
+			else if(4 == i)
+			{
+				break;
+			}
+			i++;
+		}
+		if(flag)
 		{
 			break;
-		}		
-		printf("你要发送的消息内容(50字以内):\n");
+		}
+		data.friend_id[i] = '\0';
+
+		
 		while((ch = getchar() != '\n' && ch != EOF));
+		printf("你要发送的消息内容(50字以内):\n");		
 		fgets(data.information, 100, stdin);
 
 		while(1)
@@ -588,20 +630,19 @@ int _register(int sockfd)
 //登陆
 int log_in(int sockfd)
 {
-	printf("进入log_in函数\n");
+	//printf("进入log_in函数\n");
 	AGREEMENT data;
 	int cnt;
 	struct information input_data;
 	memset(&input_data, 0, sizeof(input_data));
 	memset(&data, 0, sizeof(data));
 	
-	login_func(&data, &input_data, login_mark);
+	login_func( &input_data);
 
-	login_mark--;
 
 	data.order = 2;
 	strcpy(data.mine_id, input_data.id);
-	strcpy(data.password, input_data.password);		
+	strcpy(data.password, input_data.password);
 	strcpy(data.information, "请求登陆");
 
 	while(1)

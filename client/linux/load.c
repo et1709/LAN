@@ -1,37 +1,18 @@
 ﻿#include"registered.h"
 #include"function.h"
 
-void login_func(AGREEMENT *data, struct information *info, int flag)
+void login_func(struct information *info)
 {
 	char ch;
-	printf("进入login_func\n");
-	setbuf(stdin, NULL);
-	printf("=====flag = %d\n", flag);
-	if(flag == 3)
-	{
-		printf("请输入您的账号：\n");
-		fgets(info->id, 6, stdin);
-		strcpy(data->mine_id, info->id);
-		strcpy(buffer, info->id);
-		printf("=======data->id %s\n", data->mine_id);
-		while((ch = getchar()) != '\n' && ch != EOF);
-		
-		printf("请输入登陆密码：\n");
-		fgets(info->password, 6, stdin);
-		strcpy(data->password, info->password);
-		printf("=======data->password %s\n", data->password);
-		//setbuf(stdin, NULL);
-	}
-	else if(flag >= 0)
-	{
-		printf("请重新输入登陆密码(剩余%d次机会)\n", flag);
-		fgets(info->password, 6, stdin);
-		strcpy(data->password, info->password);
-		strcpy(data->mine_id, buffer);
-		
-	}
-	else {
-		printf("请重新注册或者登陆");
-		login_mark = 3;
-	}
+	while(((ch = getchar()) != '\n') && (ch != EOF));
+	printf("请输入您的账号(5位数):\n");
+	gets(info->id);	
+	//printf("%c", info->id);
+
+	while(((ch = getchar()) != '\n') && (ch != EOF));
+	printf("请输入登陆密码(5)位数:\n");
+	//system("stty -echo");
+	gets(info->password);
+	//system("stty echo");
+	
 }

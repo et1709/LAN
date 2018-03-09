@@ -9,6 +9,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <string.h>
+#include <pthread.h>
+
 
 #include "registered.h"
 #include "connect_server.h"
@@ -38,13 +40,11 @@ typedef struct head
 	QUEUE_NODE* rear;
 }INFORMATION_QUEUE;
 
-extern char buffer[20];
-extern int login_mark;
 
 
 
 void function(int sockfd);
-int handler_receive(void *);
+void * handler_receive(void *);
 void *_send(void *arg);
 void *receive(void *arg);
 INFORMATION_QUEUE *init_queue(void);

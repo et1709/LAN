@@ -19,6 +19,6 @@ struct information
 
 //***********函数声明***********
 extern int register_func(struct information *info);
-extern void login_func(AGREEMENT *data, struct information *info, int flag);
+extern void login_func(struct information *info);
 
 #endif
