@@ -39,7 +39,7 @@ void function(int sockfd)
 	{
 		login_menu();
 		log_in_menu(sockfd);
-		sleep(1);
+		usleep(300000);
 
 		// 加互斥锁	
 		pthread_mutex_lock(&mutex);
@@ -474,9 +474,10 @@ int single_chat(void)
 	AGREEMENT data;
 	int cnt, i, flag;
 	char ch;
-
+	printf("进入单聊模式...\n");
 	while(1)
 	{			
+		flag = 0;
 		memset(&data, 0, sizeof(data));
 		data.order = 3;
 		while((ch = getchar() != '\n' && ch != EOF));
@@ -509,8 +510,8 @@ int single_chat(void)
 		{
 			break;
 		}
-		data.friend_id[i] = '\0';
-
+		data.friend_id[i + 1] = '\0';
+		printf("friend_id = %s\n", data.friend_id);
 		
 		while((ch = getchar() != '\n' && ch != EOF));
 		printf("你要发送的消息内容(50字以内):\n");		
@@ -588,16 +589,14 @@ int _register(int sockfd)
 	strcpy(data.age, input_data.age);
 	strcpy(data.sex, input_data.sex);
 	strcpy(data.information, "请求注册");
-
+/*
 	printf("=========注册返回信息:==========\n");
 	printf("nickname:%s, mine_id: %s\n",
 		    data.nickname, data.mine_id);
-	
 	printf("age:%s, sex: %s\n",
 		    data.age, data.sex);
-
 	printf("=================================\n");
-
+*/
 	while(1)
 	{
 		//消息入队
@@ -610,20 +609,7 @@ int _register(int sockfd)
 			break;
 		}
 	}
-	
-/*	
-	while((-1 == (cnt = send(sockfd, (void*)&data, sizeof(data), 0))) 
-			   && (EINTR == errno));
-	if(-1 == cnt)
-	{
-		perror("发送请求注册失败!");
-		return -1;
-	}
-	else if(cnt > 0)
-	{
-		printf("成功发送请求 %d 消息\n", data.order);
-	}
-*/	
+
 	return 0;
 }
 

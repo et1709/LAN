@@ -6,14 +6,16 @@ int register_func(struct information *info)
 {  
 	char tmp_sex;
 	char ch, i;
-	int tmp_age, flag;
+	int tmp_age, len;
+	char tem_buf[15];
 
+	// 1: 创建账号
+	while((ch = getchar() != '\n') && (ch != EOF));
 	printf("==================注册输入阶段:===============\n");
-	printf("创建账号(5位数):\n");
-	while((ch = getchar() != '\n' && ch != EOF));
+	printf("创建账号(5位数):\n");	
 	i = 0;
 	while(1)
-	{		
+	{				
 		info->id[i] = getchar();
 		if('\n' == info->id[i] && i < 5)
 		{
@@ -32,98 +34,99 @@ int register_func(struct information *info)
 	printf("login_account = %s\n", info->id);
 	
 		
-	//用于创建密码
-	while((ch = getchar() != '\n' && ch != EOF));
-	printf("请输入需要创建的密码(5位数):\n");	
-	i = 0;
+	// 2: 创建密码
+	//while((ch = getchar() != '\n') && (ch != EOF));
+	printf("请输入需要创建的密码(3~5位数):\n");
 	while(1)
-	{
-		system("stty -echo");
-		info->password[i] = getchar();
-		system("stty echo");
-		if('\n' == info->password[i] && i < 5)
+	{		
+		//system("stty -echo");
+		fgets(tem_buf, 8, stdin);
+		//system("stty echo");		
+		len = strlen(tem_buf);
+		
+		printf("tem_buf = %s\n", tem_buf);
+		printf("len = %d\n", len);
+		if(len > 5)
 		{
-			i = 0;
-			printf("您输入的位数不够,请重新输入!\n");
-			memset(info->password, 0, sizeof(info->password));
+			printf("您输入的位数太多,请重新输入!\n");
+			memset(tem_buf, 0, sizeof(tem_buf));
+			while((ch = getchar() != '\n') && (ch != EOF));
 			continue;
 		}
-		else if(5 == i)
+		else if( len < 3 )
 		{
+			printf("您输入的位数太少,请重新输入!\n");
+			memset(tem_buf, 0, sizeof(tem_buf));
+			continue;
+		}
+		else
+		{
+			strcpy(info->password, tem_buf);
 			break;
 		}
-		i++;		
-	}	
-	info->password[i] = '\0';
+	}		
 	printf("password = %s\n", info->password);
 	
 
-	//创建昵称
-	while((ch = getchar() != '\n' && ch != EOF));
-	printf("请输入需要创建的呢称(10位英文字母):\n");	
-	i = 0;
+	// 3: 创建昵称	
+	printf("请输入需要创建的呢称(10位以内英文字母):\n");	
 	while(1)
 	{
-		info->nickname[i] = getchar();
-		if('\n' == info->nickname[i] && i < 10)
+		
+		fgets(tem_buf, 12, stdin);
+		len = strlen(tem_buf);
+		if(len > 10)
 		{
-			i = 0;
-			printf("您输入的位数不够,请重新输入!\n");
-			memset(info->nickname, 0, sizeof(info->nickname));
+			printf("您输入的位数太多,请重新输入!\n");
+			memset(tem_buf, 0, sizeof(tem_buf));
+			while((ch = getchar() != '\n') && (ch != EOF));
 			continue;
 		}
-		else if(10 == i)
+		else
 		{
+			strcpy(info->nickname, tem_buf);
 			break;
-		}
-		i++;				
+		}				
 	}
-	info->nickname[i] = '\0';
 	printf("nickname = %s\n",info->nickname);  //打印输入的昵称
 
 
 	//创建年龄
-	while((ch = getchar() != '\n' && ch != EOF));
-	printf("请输入你的年龄(3位数):\n");	
-	i = 0;
+	printf("请输入你的年龄(3位数以内):\n");
 	while(1)
 	{
-		info->age[i] = getchar();
-		if('\n' == info->age[i] && i < 3)
+		fgets(tem_buf, 5, stdin);
+		len = strlen(tem_buf);
+		if(len > 3)
 		{
-			i = 0;
-			printf("您输入的位数不够,请重新输入!\n");
-			memset(info->age, 0, sizeof(info->age));
+			printf("您输入的位数太多,请重新输入!\n");
+			memset(tem_buf, 0, sizeof(tem_buf));
+			while((ch = getchar() != '\n') && (ch != EOF));
 			continue;
 		}
-		else if(3 == i)
+		else
 		{
+			strcpy(info->age, tem_buf);
 			break;
 		}
-		i++;
 	}
-	info->age[i] = '\0';
 	printf("rgs_age = %s\n", info->age);
 
 	
-	//选择性别
-	while(((ch = getchar()) != '\n') && (ch != EOF));
+	//选择性别	
 	printf("请选择性别:\n");
 	printf("男(m/M)      or      女(f/F)\n");
 	while(1)
-	{
-		
-		info->sex[0] = getchar();
-		
-		printf("info->sex[0] = %c\n", info->sex[0]);
-		
-		if(('m' != info->sex[0]) && ('M' != info->sex[0]) 
+	{				
+		info->sex[0] = getchar();	
+		//printf("info->sex[0] = %c\n", info->sex[0]);		
+		if(('m' != info->sex[0]) && ('M' != info->sex[0])
 			&& ('f' != info->sex[0]) && ('F' != info->sex[0]))
 		{
 			printf("输入错误，请重新输入!\n");
 			while(((ch = getchar()) != '\n') && (ch != EOF));
 			continue;
-		}		
+		}
 		break;
 	}
 	info->sex[1] = '\0';
