@@ -112,7 +112,8 @@ int register_func(struct information *info)
 		{
 			printf("您输入的位数太多,请重新输入!\n");
 			memset(tem_buf, 0, sizeof(tem_buf));
-			while((ch = getchar() != '\n') && (ch != EOF));
+			//while((ch = getchar() != '\n') && (ch != EOF));
+			fflush(stdin);
 			continue;
 		}
 		else if('\n' != tem_buf[0])
@@ -141,6 +142,7 @@ int register_func(struct information *info)
 		break;
 	}
 	info->sex[1] = '\0';
+	fflush(stdin);
 	printf("rgs_sex = %s\n", info->sex);
 	printf("==================================================\n");
 		
