@@ -141,7 +141,7 @@ void * handler_receive(void *pSockfd)
 					break;
 				case 77:
 					printf("   查找好友列表成功! 好友列表是:\n");
-					for(int i; i < receive_data.friend_num; i++)
+					for(int i = 0; i < receive_data.friend_num; i++)
 					{
 						printf("   %s(%s)\n", receive_data.friend_list.friend_nickname[i],
 						   		receive_data.friend_list.friend_id[i]);
@@ -614,6 +614,14 @@ int _register(int sockfd)
 	strcpy(data.sex, input_data.sex);
 	strcpy(data.information, "请求注册");
 
+	printf("============_register===========\n");
+	printf("mine_id:", data.mine_id);
+	printf("nickname:", data.nickname);
+	printf("password:", data.password);
+	printf("age:", data.age);
+	printf("sex:", data.sex);
+	printf("============_register===========\n");
+	
 	while(1)
 	{
 		//消息入队
