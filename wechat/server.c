@@ -1,6 +1,6 @@
 #include "server.h"
 
-struct info infos[MAXBACKLOG];
+R_THREAD infos[MAXBACKLOG];						//接收线程数组
 struct ClientInfo cliInfos[MAXBACKLOG];			//已登录的客户信息
 int cliNum = 0;									//客户端数
 pthread_mutex_t mutex;							//互斥锁;
@@ -8,7 +8,7 @@ pthread_mutex_t mutex;							//互斥锁;
 
 int main()
 {	
-	struct TcpInit tcp_init;
+	TCP_INIT tcp_init;
 		
 	tcp_server_init(&tcp_init);					//TCP 服务器初始化
 

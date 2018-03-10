@@ -18,6 +18,9 @@ sqlite3 *db;
 int creatNum = 0;
 char PasswdStr[10];
 char NameStr[10];
+char creatNumStr[10];
+
+User_Info Check_Info;
 
 /*******************************************************************************
  * 名称: 
@@ -319,6 +322,7 @@ int add_to_qqlist_table(char *userName, char *qqID, char *qqName, char *p_age, c
 	// 创建一个数据库
 	if (SQLITE_OK != (err = sqlite3_open(str, &db))) {
 	
+		printf("create user_database failed\n");
 		printf("创建数据库 %s 失败(%s)\n", str, sqlite3_errstr(err));
 		return -1;
 	}
@@ -326,7 +330,7 @@ int add_to_qqlist_table(char *userName, char *qqID, char *qqName, char *p_age, c
 	memset(&sql, 0, sizeof(sql));
 	sprintf(sql, "insert into qqlist_table values('%s', '%s', '%s', '%s')", qqID, qqName, p_age, q_sex);
 	if (SQLITE_OK != sqlite3_exec(db, sql, NULL, NULL, NULL)) {
-
+		printf("-------------------------\n");
 		// 关闭数据库
 		sqlite3_close(db);
 		return -1;
@@ -341,9 +345,119 @@ int add_to_qqlist_table(char *userName, char *qqID, char *qqName, char *p_age, c
 }
 
 
+/*******************************************************************************
+ * 名称: 
+ * 功能: 
+ * 形参: 无
+ * 返回: 无
+ * 说明: 无
+*******************************************************************************/
+int get_qqID_callback(void *data, int col_count, char **col_values, char **col_Name)
+{      
+	memset(&Check_Info, 0, sizeof(Check_Info));     
+	
+	sprintf(Check_Info.qqIdStr, "%s", col_values[0]); 
+	sprintf(Check_Info.qqNameStr, "%s", col_values[1]); 
+	sprintf(Check_Info.AgeStr, "%s", col_values[3]); 
+	sprintf(Check_Info.SexStr, "%s", col_values[4]); 
+	
+	return 0;                               
+}                   
+
+/*******************************************************************************
+ * 名称: 
+ * 功能: 
+ * 形参: 无
+ * 返回: 无
+ * 说明: 无
+*******************************************************************************/
+User_Info *check_user_table_Info(char *qqID)
+{
+	int err;
+	char *pErrMsg = 0;
+	char sql[100];
+	 
+	// 创建一个数据库
+	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {
+	
+		printf("创建数据库 %s 失败(%s)\n", "database.db", sqlite3_errstr(err));
+		return NULL;
+	}
+	      
+	memset(&sql, 0, sizeof(sql));
+	sprintf(sql, "select * from user_table where qqID = '%s';", qqID);     
+	if (SQLITE_OK != sqlite3_exec(db, sql, get_qqID_callback, NULL, &pErrMsg)) {
+    
+		// 关闭数据库
+		sqlite3_close(db);
+		return NULL;
+	}
+	
+	if (0 == strcmp(Check_Info.qqIdStr, qqID))
+		return &Check_Info;
+	else
+		return NULL;
+}
 
 
 
+/*******************************************************************************
+ * 名称: 
+ * 形参: 无
+ * 返回: 无
+ * 说明: 无
+ * 使用: 无
+*******************************************************************************/
+int get_next_qqNum_callback(void *data, int col_count, char **col_values, char **col_Name)
+{
+	char string[10];
+	
+	sprintf(string, "%s", col_values[0]);
+	creatNum = strtoul(string, NULL, 10);
+	
+	return 0;
+}
+
+/*******************************************************************************
+ * 名称: 
+ * 形参: 无
+ * 返回: 无
+ * 说明: 无
+ * 使用: int tmp = get_next_qqNum()
+*******************************************************************************/
+char *get_next_qqNum(void)
+{
+	int err;
+	char *pErrMsg = 0;
+	char sql[100] = "select * from qqNum_table";
+
+	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {				// 打开数据库
+	
+		printf("创建数据库 %s 失败(%s)\n", "database.db", sqlite3_errstr(err));
+		return NULL;
+	}
+	
+	err = sqlite3_exec(db, sql, get_next_qqNum_callback, 0, &pErrMsg);
+    if (err != SQLITE_OK) {
+    
+		sqlite3_close(db);
+        return NULL;
+    }
+	
+	creatNum += 1;																// 读取 QQNum + 1, 写回 qqNum_table
+	sprintf(creatNumStr, "%d", creatNum);
+	sprintf(sql, "update qqNum_table set qqNum = '%s';", creatNumStr);
+	err = sqlite3_exec(db, sql, NULL, NULL, &pErrMsg);
+    if (err != SQLITE_OK) {
+
+		sqlite3_close(db);
+        return NULL;
+    }
+	
+	sqlite3_close(db);
+	
+	return creatNumStr;
+}
 
 
 
