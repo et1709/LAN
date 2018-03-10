@@ -72,6 +72,7 @@ int add_to_qqlist_table(char *userName, char *qqID, char *qqName, char *p_age, c
 
 
 
+
 typedef struct info
 {
 	char qqIdStr[10];
