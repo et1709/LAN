@@ -20,8 +20,6 @@ extern char NameStr[10];
 extern User_Info Check_Info;
 extern int creatNum;
 extern char creatNumStr[10];
-extern QqList_List *QqList_Phead;
-
 
 /******************************函数声明****************************************/
 int creat_database(void);
@@ -33,11 +31,6 @@ int add_to_qqlist_table(char *userName, char *qqID, char *qqName, char *p_age, c
 int get_next_qqNum_callback(void *data, int col_count, char **col_values, char **col_Name);
 char *get_next_qqNum(void);
 User_Info *check_user_table_Info(char *qqID);
-QqList_List *get_qqList_table_info(char *userName);
-void Display_Kernel_list1(QqList_List *head);
-
-
-
 
 #endif
 

@@ -19,16 +19,7 @@ int creatNum = 0;
 char PasswdStr[10];
 char NameStr[10];
 char creatNumStr[10];
-typedef struct 
-{
-	char qqIdStr[10];
-	char qqNameStr[10];
-	char AgeStr[10];
-	char SexStr[10];
-	struct list_head list;	// &new->list新节点小结构体的地址
-							// &head->list头部小结构体的地址
-} QqList_List;
-QqList_List *QqList_Phead;
+
 User_Info Check_Info;
 
 /*******************************************************************************
@@ -57,6 +48,7 @@ int is_file_exist(const char *file_path)
 *******************************************************************************/
 int creat_database(void)
 {
+	// 定义 sqlite3 指针
 	char *pErrMsg = 0;
 	char *dbname = "database.db";
 	int err;
@@ -66,33 +58,34 @@ int creat_database(void)
 	
 	if (-1 == is_file_exist("database.db")) {
 		
-		if (SQLITE_OK != (err = sqlite3_open(dbname, &db))) {					// 打开数据库
+		// 创建一个数据库
+		if (SQLITE_OK != (err = sqlite3_open(dbname, &db))) {
 		
 			printf("创建数据库 %s 失败(%s)\n", dbname, sqlite3_errstr(err));
 			return -1;
 		}
-		
-		sqlite3_exec(db, table1, NULL, NULL, &pErrMsg);							// 执行建表SQL, 创建一个table
+		// 执行建表SQL, 创建一个table
+		sqlite3_exec(db, table1, NULL, NULL, &pErrMsg);
 		if (err != SQLITE_OK) {
 			
 			fprintf(stderr, "创建数据 table 失败: %s\n", pErrMsg);
 			sqlite3_free(pErrMsg);
 		}
-		
-		sqlite3_exec(db, table2, NULL, NULL, &pErrMsg);							// 执行建表SQL, 创建一个table
+		// 执行建表SQL, 创建一个table
+		sqlite3_exec(db, table2, NULL, NULL, &pErrMsg);
 		if (err != SQLITE_OK) {
 			
 			fprintf(stderr, "创建数据 table 失败: %s\n", pErrMsg);
 			sqlite3_free(pErrMsg);
 		}
-		
-		sqlite3_exec(db, table3, NULL, NULL, &pErrMsg);							// 执行建表SQL, 创建一个table
+		sqlite3_exec(db, table3, NULL, NULL, &pErrMsg);
 		if (err != SQLITE_OK) {
 			
 			fprintf(stderr, "插入数据失败: %s\n", pErrMsg);
 			sqlite3_free(pErrMsg);
 		}
 	
+		// 关闭数据库
 		sqlite3_close(db);
 	}
 	
@@ -109,6 +102,7 @@ int creat_database(void)
 *******************************************************************************/
 int creat_userbase(char *userName)
 {
+	// 定义 sqlite3 指针
 	char *pErrMsg = 0;
 	char str[100];
 	int err;
@@ -120,33 +114,33 @@ int creat_userbase(char *userName)
 	sprintf(str, "%s.db", userName);
 	if (-1 == is_file_exist(str)) {
 		
-		if (SQLITE_OK != (err = sqlite3_open(str, &db))) {						// 创建一个数据库
+		// 创建一个数据库
+		if (SQLITE_OK != (err = sqlite3_open(str, &db))) {
 		
 			printf("创建数据库 %s 失败(%s)\n", str, sqlite3_errstr(err));
 			return -1;
 		}
-		
-		sqlite3_exec(db, table1, NULL, NULL, &pErrMsg);							// 执行建表SQL, 创建一个table
+		// 执行建表SQL, 创建一个table
+		sqlite3_exec(db, table1, NULL, NULL, &pErrMsg);
+		if (err != SQLITE_OK) {
+			
+			fprintf(stderr, "创建用户数据 table 失败: %s\n", pErrMsg);
+			sqlite3_free(pErrMsg);
+		}
+		sqlite3_exec(db, table2, NULL, NULL, &pErrMsg);
+		if (err != SQLITE_OK) {
+			
+			fprintf(stderr, "创建用户数据 table 失败: %s\n", pErrMsg);
+			sqlite3_free(pErrMsg);
+		}
+		sqlite3_exec(db, table3, NULL, NULL, &pErrMsg);
 		if (err != SQLITE_OK) {
 			
 			fprintf(stderr, "创建用户数据 table 失败: %s\n", pErrMsg);
 			sqlite3_free(pErrMsg);
 		}
 		
-		sqlite3_exec(db, table2, NULL, NULL, &pErrMsg);							// 执行建表SQL, 创建一个table
-		if (err != SQLITE_OK) {
-			
-			fprintf(stderr, "创建用户数据 table 失败: %s\n", pErrMsg);
-			sqlite3_free(pErrMsg);
-		}
-		
-		sqlite3_exec(db, table3, NULL, NULL, &pErrMsg);							// 执行建表SQL, 创建一个table
-		if (err != SQLITE_OK) {
-			
-			fprintf(stderr, "创建用户数据 table 失败: %s\n", pErrMsg);
-			sqlite3_free(pErrMsg);
-		}
-		
+		// 关闭数据库
 		sqlite3_close(db);
 	}
 	
@@ -166,7 +160,8 @@ int add_to_database(char *qqID, char *qqName, char *qqPaswd, char *p_age, char *
 	char sql[100];
 	char *pErrMsg = 0;
 	
-	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {				// 打开数据库
+	// 打开数据库
+	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {
 	
 		printf("创建数据库 %s 失败(%s)\n", "database.db", sqlite3_errstr(err));
 		return -1;
@@ -176,11 +171,15 @@ int add_to_database(char *qqID, char *qqName, char *qqPaswd, char *p_age, char *
 	sprintf(sql, "insert into user_table values('%s', '%s', '%s', '%s', '%s')", qqID, qqName, qqPaswd, p_age, q_sex);
 	if (SQLITE_OK != sqlite3_exec(db, sql, NULL, NULL, &pErrMsg)) {
 
+		// 关闭数据库
 		sqlite3_close(db);
 		return -1;
 	}
 	
-	creat_userbase(qqName);														// 新用户注册之后 创建一个用户数据库
+	// 新用户注册之后 创建一个用户数据库
+	creat_userbase(qqName);
+	
+	// 关闭数据库
 	sqlite3_close(db);
 	
 	return 0;
@@ -213,8 +212,9 @@ char *search_user_table_Passwd(char *qqID)
 	int err;
 	char *pErrMsg = 0;
 	char sql[100];
-	
-	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {				// 打开数据库
+	 
+	// 创建一个数据库
+	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {
 	
 		printf("创建数据库 %s 失败(%s)\n", "database.db", sqlite3_errstr(err));
 		return NULL;
@@ -224,11 +224,10 @@ char *search_user_table_Passwd(char *qqID)
 	sprintf(sql, "select * from user_table where qqID = '%s';", qqID);
 	if (SQLITE_OK != sqlite3_exec(db, sql, get_userPasswd_callback, NULL, &pErrMsg)) {
 
+		// 关闭数据库
 		sqlite3_close(db);
 		return NULL;
 	}
-	
-	sqlite3_close(db);
 	
 	return PasswdStr;
 }
@@ -261,7 +260,8 @@ char *search_user_table_qqName(char *qqID)
 	char *pErrMsg = 0;
 	char sql[100];
 	 
-	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {				// 打开数据库
+	// 创建一个数据库
+	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {
 	
 		printf("创建数据库 %s 失败(%s)\n", "database.db", sqlite3_errstr(err));
 		return NULL;
@@ -271,11 +271,10 @@ char *search_user_table_qqName(char *qqID)
 	sprintf(sql, "select * from user_table where qqID = '%s';", qqID);
 	if (SQLITE_OK != sqlite3_exec(db, sql, get_userQQname_callback, NULL, &pErrMsg)) {
 
+		// 关闭数据库
 		sqlite3_close(db);
 		return NULL;
 	}
-	
-	sqlite3_close(db);
 	
 	return NameStr;
 }
@@ -295,13 +294,12 @@ int create_friendchat_table(char *chatName)
 	
 	memset(&sql, 0, sizeof(sql));
 	sprintf(sql, "create table %s_chatTable(qqID TEXT, qqName TEXT, qqChat TEXT, qqTime TEXT)", chatName);
+	// 创建一个数据库
 	if (SQLITE_OK != sqlite3_exec(db, sql, NULL, NULL, NULL)) {
 
 		// 关闭数据库
 		return -1;
 	}
-	
-	sqlite3_close(db);
 	
 	return 0;	// OK
 }
@@ -321,7 +319,8 @@ int add_to_qqlist_table(char *userName, char *qqID, char *qqName, char *p_age, c
 	
 	memset(&str, 0, sizeof(str));
 	sprintf(str, "%s.db", userName);
-	if (SQLITE_OK != (err = sqlite3_open(str, &db))) {							// 打开数据库
+	// 创建一个数据库
+	if (SQLITE_OK != (err = sqlite3_open(str, &db))) {
 	
 		printf("create user_database failed\n");
 		printf("创建数据库 %s 失败(%s)\n", str, sqlite3_errstr(err));
@@ -331,12 +330,15 @@ int add_to_qqlist_table(char *userName, char *qqID, char *qqName, char *p_age, c
 	memset(&sql, 0, sizeof(sql));
 	sprintf(sql, "insert into qqlist_table values('%s', '%s', '%s', '%s')", qqID, qqName, p_age, q_sex);
 	if (SQLITE_OK != sqlite3_exec(db, sql, NULL, NULL, NULL)) {
-
+		printf("-------------------------\n");
+		// 关闭数据库
 		sqlite3_close(db);
 		return -1;
 	}
 	
 	create_friendchat_table(qqName);
+
+	// 关闭数据库
 	sqlite3_close(db);
 	
 	return 0;	// OK
@@ -375,7 +377,8 @@ User_Info *check_user_table_Info(char *qqID)
 	char *pErrMsg = 0;
 	char sql[100];
 	 
-	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {				// 打开数据库
+	// 创建一个数据库
+	if (SQLITE_OK != (err = sqlite3_open("database.db", &db))) {
 	
 		printf("创建数据库 %s 失败(%s)\n", "database.db", sqlite3_errstr(err));
 		return NULL;
@@ -385,6 +388,7 @@ User_Info *check_user_table_Info(char *qqID)
 	sprintf(sql, "select * from user_table where qqID = '%s';", qqID);     
 	if (SQLITE_OK != sqlite3_exec(db, sql, get_qqID_callback, NULL, &pErrMsg)) {
     
+		// 关闭数据库
 		sqlite3_close(db);
 		return NULL;
 	}
@@ -455,104 +459,7 @@ char *get_next_qqNum(void)
 	return creatNumStr;
 }
 
-/*******************************************************************************
- * 名称: 
- * 形参: 无
- * 返回: 无
- * 说明: 无
- * 使用: 无
-*******************************************************************************/
-QqList_List *Init_Kernel_List1(void)
-{
-	QqList_List *p = (QqList_List *)malloc(sizeof(QqList_List));
-	if (NULL == p) {
-	
-		return NULL;
-	}
-	
-	INIT_LIST_HEAD(&p->list);													// 里面的前指针prev和后指针next指向自己
 
-	return p;
-}
-
-/*******************************************************************************
- * 名称: 
- * 形参: 无
- * 返回: 无
- * 说明: 无
- * 使用: 无
-*******************************************************************************/
-int get_qqList_callback(void *data, int col_count, char **col_values, char **col_Name)
-{
-	QqList_List *new = Init_Kernel_List1();;
-	
-	sprintf(new->qqIdStr, "%s", col_values[0]);
-	sprintf(new->qqNameStr, "%s", col_values[1]);
-	sprintf(new->AgeStr, "%s", col_values[2]);
-	sprintf(new->SexStr, "%s", col_values[3]);
-	list_add(&new->list, &QqList_Phead->list);
-	
-	return 0;
-}
-
-/*******************************************************************************
- * 名称: 
- * 形参: 无
- * 返回: 无
- * 说明: 无
- * 使用: QqList_List *get_qqList_table_info("liyan")
-*******************************************************************************/
-QqList_List *get_qqList_table_info(char *userName)
-{
-	int err;
-	char *pErrMsg = 0;
-	char sql[100];
-	char str[100];
-	 
-	memset(&str, 0, sizeof(str));
-	sprintf(str, "%s.db", userName);
-	if (SQLITE_OK != (err = sqlite3_open(str, &db))) {							// 打开数据库
-	
-		printf("打开数据库 %s 失败(%s)\n", "str", sqlite3_errstr(err));
-		return NULL;
-	}
-	
-	memset(&sql, 0, sizeof(sql));
-	strcpy(sql, "select * from qqlist_table;");
-	if (SQLITE_OK != sqlite3_exec(db, sql, get_qqList_callback, NULL, &pErrMsg)) {
-
-		sqlite3_close(db);														// 关闭数据库
-		return NULL;
-	}
-	
-	sqlite3_close(db);
-	
-	return QqList_Phead;
-}
-
-/*******************************************************************************
- * 名称: 
- * 形参: 无
- * 返回: 无
- * 说明: 无
- * 使用: Display_Kernel_list(Phead)
-*******************************************************************************/
-void Display_Kernel_list1(QqList_List *head)
-{
-	int count = 1;
-	QqList_List *tmp;
-	struct list_head *pos, *n;
-	
-	list_for_each(pos, &head->list) { 											// 遍历显示
-	
-		tmp = list_entry(pos, QqList_List, list);	
-		printf("qqID：%-7s", tmp->qqIdStr);
-		printf("qqNAME：%-10s", tmp->qqNameStr);
-		printf("qqAGE：%-4s", tmp->AgeStr);
-		printf("qqSEX：%s\n", tmp->SexStr);
-		count++;
-	}
-}
 
 
 
