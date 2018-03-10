@@ -42,7 +42,7 @@ void function(int sockfd)
 		pthread_mutex_lock(&LoginMutex);
 		while(0 == LoginFlag)
 		{
-			pthread_cond_wait(&LoginCond, &LoginMutex);
+			pthread_cond_wait(&LoginCond, &LoginMutex);  //等待条件成立
 		}
 		pthread_mutex_unlock(&LoginMutex);
 		//printf("LoginFlag = %d\n", LoginFlag);
@@ -365,7 +365,7 @@ bool dequeue(INFORMATION_QUEUE *pQueue, AGREEMENT *pData)
 /*功能选择
 * 1:单聊        2:群聊       3:查找好友
 * 4:添加好友    5:查找群     6:创建群  
-* 7:添加群      8:发送文件   0:退出
+* 7:添加群      8:发送文件   9:查找好友列表   0:退出
 */
 int choose_function(void)
 {
@@ -393,7 +393,7 @@ int choose_function(void)
 			
 			break;
 		case 3:
-			find_friends();              // 查找好友
+			find_friends();              // 查看好友
 			break;
 		case 4:
 			add_friend();                // 添加好友
@@ -410,6 +410,10 @@ int choose_function(void)
 		case 8:							 //发送文件 
 			
 			break;
+		case 9:							 //查看好友列表
+			find_friend_list();
+			break;
+		
 	}
 }
 
@@ -470,7 +474,7 @@ int find_friends(void)
 	return 0;
 }
 
-//查找好友列表
+//查看好友列表
 void find_friend_list(void)
 {
 	AGREEMENT data;
