@@ -141,7 +141,8 @@ void * handler_receive(void *pSockfd)
 					break;
 				case 77:
 					printf("   查找好友列表成功! 好友列表是:\n");
-					for(int i = 0; i < receive_data.friend_num; i++)
+					int i;
+					for(i = 0; i < receive_data.friend_num; i++)
 					{
 						printf("   %s(%s)\n", receive_data.friend_list.friend_nickname[i],
 						   		receive_data.friend_list.friend_id[i]);
@@ -365,21 +366,16 @@ bool dequeue(INFORMATION_QUEUE *pQueue, AGREEMENT *pData)
 int choose_function(void)
 {
 	int num;
-	char ch;
+
 	while(1)
 	{		
-		while(scanf("%d", &num) <= 0)
-		{
-			printf("输入错误, 请重新输入!\n");
-			while((ch = getchar()) != '\n' && ch != EOF);
-		}
+		num = get_integer();
 		if(num > 8 || num < 0)
 		{
-			printf("抱歉,没有这个选项, 请重新输入!\n");
+			printf("Sorry, without this option, please retype!\n");
+			continue;
 		}
-		else {
-			break;
-		}
+		break;
 	}
 	switch(num)
 	{
@@ -410,9 +406,6 @@ int choose_function(void)
 		case 8:							 //发送文件 
 			
 			break;
-		default:
-			printf("抱歉,没有这个选项\n");
-			break;
 	}
 }
 
@@ -423,9 +416,10 @@ void add_friend(void)
 	char ch;
 	memset(&data, 0, sizeof(data));
 	data.order = 6;
+	
 	printf("请输入您好友的账号:\n");
-	while((ch = getchar() != '\n' && ch != EOF));
-	fgets(data.friend_id, 6, stdin);
+	get_size_string(data.friend_id, 5);
+	
 	strcpy(data.information, "添加好友");
 	strcpy(data.mine_id, my_account);
 	while(1)
@@ -450,9 +444,10 @@ int find_friends(void)
 
 	memset(&data, 0, sizeof(data));
 	data.order = 4;
-	printf("请输入您好友的账号:\n");
-	while((ch = getchar() != '\n' && ch != EOF));
-	fgets(data.friend_id, 6, stdin);
+	
+	printf("请输入您好友的账号(5位数):\n");
+	get_size_string(data.friend_id, 5);
+	
 	strcpy(data.information, "查找好友");
 	strcpy(data.mine_id, my_account);
 	
@@ -504,42 +499,16 @@ int single_chat(void)
 		flag = 0;
 		memset(&data, 0, sizeof(data));
 		data.order = 3;
-		while((ch = getchar() != '\n' && ch != EOF));
+
 		printf("请问你要跟哪位好友(好友ID)聊天? (按0退出单聊)");		
-		//fgets(data.friend_id, 6, stdin);
-		i = 0;
-		while(1)
-		{
-			data.friend_id[i] = getchar();
-			printf("data.friend_id[%d] = %c\n", i, data.friend_id[i]);
-			if( '0' == (data.friend_id[i]))
-			{
-				flag = 1;
-				break;
-			}
-			if('\n' == data.friend_id[i] && i < 5)
-			{
-				i = 0;
-				printf("您输入的位数不够,请重新输入!\n");
-				memset(data.friend_id, 0, sizeof(data.friend_id));
-				continue;
-			}
-			else if(4 == i)
-			{
-				break;
-			}
-			i++;
-		}
-		if(flag)
-		{
-			break;
-		}
-		data.friend_id[i + 1] = '\0';
+
+		get_size_string(data.friend_id, 5);
 		printf("friend_id = %s\n", data.friend_id);
 		
-		while((ch = getchar() != '\n' && ch != EOF));
-		printf("你要发送的消息内容(50字以内):\n");		
-		fgets(data.information, 100, stdin);
+		
+		printf("你要发送的消息内容(50字以内):\n");
+		get_string(data.information, 100);
+		
 
 		while(1)
 		{
@@ -563,18 +532,13 @@ int log_in_menu(int sockfd)
 	int rt, ch;
 	while(1)
 	{		
-		while(scanf("%d", &num) < 0)
-		{
-			printf("输入错误, 请重新输入!\n");
-		}
+		num = get_integer();
 		if(num > 3 || num < 0)
 		{
-			printf("抱歉,没有这个选项, 请重新输入!\n");
-			while((ch = getchar() != '\n') && (ch != EOF));
+			printf("Sorry, without this option, please retype!\n");
+			continue;
 		}
-		else {
-			break;
-		}
+		break;
 	}
 	switch(num)
 	{
@@ -604,7 +568,7 @@ int _register(int sockfd)
 	memset(&input_data, 0, sizeof(input_data));
 	memset(&data, 0, sizeof(data));
 
-	register_func( &input_data);
+	register_func(&input_data);
 	
 	data.order = 1;
 	strcpy(data.mine_id, input_data.id);
@@ -613,14 +577,6 @@ int _register(int sockfd)
 	strcpy(data.age, input_data.age);
 	strcpy(data.sex, input_data.sex);
 	strcpy(data.information, "请求注册");
-
-	printf("============_register===========\n");
-	printf("mine_id:", data.mine_id);
-	printf("nickname:", data.nickname);
-	printf("password:", data.password);
-	printf("age:", data.age);
-	printf("sex:", data.sex);
-	printf("============_register===========\n");
 	
 	while(1)
 	{

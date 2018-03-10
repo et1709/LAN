@@ -21,4 +21,20 @@ struct information
 extern int register_func(struct information *info);
 extern void login_func(struct information *info);
 
+//从键盘获取size以内个字符
+void get_string(char *buf, int size);
+
+//从键盘获取size个字符
+void get_size_string(char *buf, int size);
+
+//从键盘获取一个字符 
+char get_char(void);
+
+//从键盘获取一个整数
+int get_integer(void);
+
+
+
+
+
 #endif
