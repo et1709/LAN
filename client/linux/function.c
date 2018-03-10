@@ -500,9 +500,12 @@ int single_chat(void)
 		memset(&data, 0, sizeof(data));
 		data.order = 3;
 
-		printf("请问你要跟哪位好友(好友ID)聊天? (按0退出单聊)");		
-
-		get_size_string(data.friend_id, 5);
+		printf("请问你要跟哪位好友(好友ID)聊天? (按0退出单聊)\n");
+		get_string(data.friend_id, 5);
+		if('0' == data.friend_id[0])
+		{
+			break;
+		}
 		printf("friend_id = %s\n", data.friend_id);
 		
 		
@@ -571,7 +574,7 @@ int _register(int sockfd)
 	register_func(&input_data);
 	
 	data.order = 1;
-	strcpy(data.mine_id, input_data.id);
+	//strcpy(data.mine_id, input_data.id);
 	strcpy(data.nickname, input_data.nickname);
 	strcpy(data.password, input_data.password);
 	strcpy(data.age, input_data.age);

@@ -25,7 +25,7 @@ void get_string(char *buf, int size)
 	char ch;
 	while(1)
 	{
-		printf("Please enter %d characters: ", len);
+		//printf("Please enter %d characters: ", len);
 		ch = getchar();
 		if('\n' == ch)
 		{
@@ -55,7 +55,7 @@ void get_size_string(char *buf, int size)
 	char ch;
 	while(1)
 	{
-		printf("Please enter %d characters: ", len);
+		//printf("Please enter %d characters: ", len);
 		ch = getchar();
 		if('\n' == ch)
 		{
@@ -108,20 +108,21 @@ int register_func(struct information *info)
 {  
 	int i;
 	int flag = 0;
+/*
 	// 1: 创建账号
 	printf("==================注册输入阶段:===============\n");
 	printf("创建账号(5位数):\n");
 	get_size_string(info->id, 5);	
-
-			
-	// 2: 创建密码
-	printf("请输入需要创建的密码(5位数):\n");
-	get_size_string(info->password, 5);
-	
+*/
 
 	// 3: 创建昵称	
 	printf("请输入需要创建的呢称:\n");
 	get_string(info->nickname, 5);
+
+
+	// 2: 创建密码
+	printf("请输入需要创建的密码(5位数):\n");
+	get_size_string(info->password, 5);
 
 
 	//创建年龄
@@ -130,7 +131,7 @@ int register_func(struct information *info)
 	{
 		flag = 0;
 		get_string(info->age, 3);
-		printf("info->age = %s\n", info->age);
+		//printf("info->age = %s\n", info->age);
 		for(i = 0; i < 3; i++)
 		{
 			if('\0' == info->age[i])
@@ -151,7 +152,7 @@ int register_func(struct information *info)
 			break;
 		}
 	}
-	printf("info->age = %s\n", info->age);
+	//printf("info->age = %s\n", info->age);
 		
 	
 	//选择性别	
