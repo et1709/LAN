@@ -8,8 +8,8 @@ int LoginFlag = 0;
 char my_account[6];
 
 
-pthread_mutex_t mutex; //= PTHREAD_MUTEX_INITIALIZER;    //互斥锁
-//pthread_cond_t cond;      //条件变量
+pthread_mutex_t LoginMutex; //= PTHREAD_MUTEX_INITIALIZER;    //互斥锁
+pthread_cond_t LoginCond;      //条件变量
 
 
 //功能选择
@@ -23,8 +23,9 @@ void function(int sockfd)
 	pSend_queue = init_queue();
 	receive_queue = init_queue();
 
-	// 初始化互斥锁
-	pthread_mutex_init(&mutex, NULL);
+	// 初始化互斥锁和条件变量
+	pthread_mutex_init(&LoginMutex, NULL);
+	pthread_cond_init(&LoginCond, NULL);
 	
 	pthread_create(&send_thread, NULL, _send, (void *)sockfd);
 	pthread_create(&receive_thread, NULL, receive, (void *)sockfd);
@@ -35,18 +36,17 @@ void function(int sockfd)
 	{
 		login_menu();
 		log_in_menu(sockfd);
-		usleep(300000);
+		//usleep(300000);
 
 		// 加互斥锁	
-		pthread_mutex_lock(&mutex);
-		if(LoginFlag)
+		pthread_mutex_lock(&LoginMutex);
+		while(0 == LoginFlag)
 		{
-			// 解锁	
-			pthread_mutex_unlock(&mutex);
-			break;
+			pthread_cond_wait(&LoginCond, &LoginMutex);
 		}
-		pthread_mutex_unlock(&mutex);
+		pthread_mutex_unlock(&LoginMutex);
 		//printf("LoginFlag = %d\n", LoginFlag);
+		break;
 	}
 	find_friend_list();
 	usleep(300000);
@@ -102,10 +102,14 @@ void * handler_receive(void *pSockfd)
 					printf("   登陆成功!\n");
 
 					// 加互斥锁	
-					pthread_mutex_lock(&mutex);
+					pthread_mutex_lock(&LoginMutex);
+					
 					LoginFlag = 1;
+
+					//发通知给等待条件成立的线程
+					pthread_cond_signal(&LoginCond);
 					// 解锁	
-					pthread_mutex_unlock(&mutex);					
+					pthread_mutex_unlock(&LoginMutex);
 					//receive_data.order = -1;
 					break;
 				case 20:
