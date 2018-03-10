@@ -47,7 +47,9 @@ void function(int sockfd)
 		}
 		pthread_mutex_unlock(&mutex);
 		//printf("LoginFlag = %d\n", LoginFlag);
-	}	
+	}
+	find_friend_list();
+	usleep(300000);
 	while(1)
 	{		
 		//进入主菜单
@@ -62,17 +64,21 @@ void main_menu(void)
 	choose_function();
 }
 
-/*处理接收消息函数:
-* 11:注册成功,  10:注册失败.   22:登陆成功,  20:登陆失败
-* 33:收到单聊信息,  44:查找到好友  40:查找好友失败
-* 66:添加好友成功,  60:添加好友失败
+/*
+*    处理接收消息函数:
+* 11:注册成功,          10:注册失败.   
+* 22:登陆成功,          20:登陆失败
+* 33:收到单聊信息,      
+* 44:查找到好友成功     40:查找好友失败
+* 66:添加好友成功,      60:添加好友失败
+* 77:查找好友列表成功   70:查找好友列表失败
 */
 void * handler_receive(void *pSockfd)
 {
 	AGREEMENT receive_data;
 	int sockfd = (int)pSockfd;
 	while(1)
-	{		
+	{
 		if(receive_queue->front != receive_queue->rear)
 		{
 			memset(&receive_data, 0, sizeof(AGREEMENT));
@@ -85,12 +91,12 @@ void * handler_receive(void *pSockfd)
 			{
 				case 11:
 					printf("   注册成功, 您的账号是: %s\n", receive_data.mine_id);
-					receive_data.order = -1;
+					//receive_data.order = -1;
 					break;
 				case 10:
 					printf("   注册失败，失败原因: %s\n", receive_data.information);
 					printf("   请重新注册!\n");
-					receive_data.order = -1;
+					//receive_data.order = -1;
 					break;
 				case 22:
 					printf("   登陆成功!\n");
@@ -100,38 +106,52 @@ void * handler_receive(void *pSockfd)
 					LoginFlag = 1;
 					// 解锁	
 					pthread_mutex_unlock(&mutex);					
-					receive_data.order = -1;
+					//receive_data.order = -1;
 					break;
 				case 20:
 					printf("   登陆失败! 失败原因: %s\n", receive_data.information);
 					printf("   请重新登陆!\n");
 					//log_in(sockfd);
-					receive_data.order = -1;
+					//receive_data.order = -1;
 					break;
 				case 33:
 					printf("   收到%s(%s)发来的消息: %s\n",
 						  	receive_data.friend_nickname, receive_data.friend_id,
 						  	receive_data.information);
-					receive_data.order = -1;
+					//receive_data.order = -1;
 					break;
 				case 44:
-					//printf("   好友列表:\n");
-					
-					receive_data.order = -1;
+					printf("   查找好友成功, 好友信息:\n");
+					printf("   昵称:%s(账号:%s)", receive_data.friend_nickname,
+							receive_data.friend_id);
+					printf("   性别:%s, 年龄: %s", receive_data.sex,
+							receive_data.age);
 					break;
 				case 40:
-
-					receive_data.order = -1;
+					printf("   查找好友失败! 原因: %s\n", receive_data.information);
+					//receive_data.order = -1;
 					break;
 				case 66:
-					printf("添加好友成功!\n");
-					receive_data.order = -1;
+					printf("   添加好友成功!\n");
+					//receive_data.order = -1;
 					break;
 				case 60:
-					printf("添加好友失败! 原因: %s\n", receive_data.information);	
-					receive_data.order = -1;
+					printf("   添加好友失败! 原因: %s\n", receive_data.information);
+					//receive_data.order = -1;
 					break;
-				
+				case 77:
+					printf("   查找好友列表成功! 好友列表是:\n");
+					for(int i = 0; i < receive_data.friend_num; i++)
+					{
+						printf("   %s(%s)\n", receive_data.friend_list.friend_nickname[i],
+						   		receive_data.friend_list.friend_id[i]);
+					}
+					//receive_data.order = -1;
+					break;
+				case 70:
+					printf("   查找好友列表失败! 原因: %s\n", receive_data.information);
+					//receive_data.order = -1;
+					break;				
 			}
 		}
 	}
@@ -151,8 +171,7 @@ void *_send(void * arg)
 	while(1)
 	{
 		if(pSend_queue->front != pSend_queue->rear)
-		{			
-			
+		{						
 			// 清空描述符集
 			FD_ZERO(&wset);
 
@@ -169,36 +188,40 @@ void *_send(void * arg)
 				continue;
 			}
 
-			memset(&send_data, 0, send_data_len);
-			
-			//消息出队
-			if(false == dequeue(pSend_queue, &send_data))
-			{
-				printf("消息出队失败!");
-				continue;
-			}		
-			cnt = send(sockfd, &send_data, send_data_len, 0);
-			if(-1 == cnt)
-			{
-				printf("发送消息失败!\n");
+			if (FD_ISSET(sockfd, &wset))
+			{			
+				memset(&send_data, 0, send_data_len);
+				
+				//消息出队
+				if(false == dequeue(pSend_queue, &send_data))
+				{
+					printf("消息出队失败!");
+					continue;
+				}		
+				cnt = send(sockfd, &send_data, send_data_len, 0);
+				if(-1 == cnt)
+				{
+					printf("发送消息失败!\n");
+				}
+				else
+				{
+					printf("成功发送了%d个字节消息!\n", cnt);
+					printf("   消息包内容是:\n");
+					printf("   order:%d, information: %s\n",
+						    send_data.order, send_data.information);
+					
+					printf("   nickname:%s, mine_id: %s\n",
+						    send_data.nickname, send_data.mine_id);
+					
+					printf("   age:%s, sex: %s\n",
+						    send_data.age, send_data.sex);
+					
+					printf("   friend_nickname:%s, friend_id: %s\n",
+						    send_data.friend_nickname, send_data.friend_id);
+					
+					printf("   send_msg_time:%s\n", send_data.send_msg_time);			
+				}
 			}
-			else{
-				printf("成功发送了%d个字节消息!\n", cnt);
-				printf("消息包内容是:\n");
-				printf("order:%d, information: %s\n",
-					    send_data.order, send_data.information);
-				
-				printf("nickname:%s, mine_id: %s\n",
-					    send_data.nickname, send_data.mine_id);
-				
-				printf("age:%s, sex: %s\n",
-					    send_data.age, send_data.sex);
-				
-				printf("friend_nickname:%s, friend_id: %s\n",
-					    send_data.friend_nickname, send_data.friend_id);
-				
-				printf("send_msg_time:%s\n", send_data.send_msg_time);			
-			}		
 		}
 	}	
 }
@@ -266,24 +289,6 @@ void *receive(void *arg)
 			}
 			else if(tcp_cnt > 0)
 			{
-				/*
-				//测试用
-				{
-					printf("接收到服务器消息(回应命令%d): %s\n", recv_data.order,
-							recv_data.information);
-					
-					temp_buf.information = CLT_TOKEN;
-					tcp_cnt = send(sockfd, &temp_buf, sizeof(temp_buf), 0);
-					if(-1 == tcp_cnt)
-					{
-						printf("转发服务器消息失败!\n");
-					}
-					else if(tcp_cnt > 0)
-					{
-						printf("转发服务器消息 (%s) 成功!\n", recv_data.information);
-					}
-				}
-				*/
 				//消息入队
 				if(false == enqueue(receive_queue, recv_data))
 				{
@@ -382,27 +387,27 @@ int choose_function(void)
 			printf("感谢使用, 88~~\n");
 			exit(0);
 		case 1:
-			single_chat();                //单聊
+			single_chat();               // 单聊
 			break;
-		case 2:
+		case 2:							 // 群聊
 			
 			break;
 		case 3:
-			find_friends();              //查找好友
+			find_friends();              // 查找好友
 			break;
 		case 4:
-			add_friend();                //添加好友
+			add_friend();                // 添加好友
 			break;
-		case 5:
+		case 5:                          // 查找群
 			
 			break;
-		case 6:
+		case 6:                          //创建群
 			
 			break;
-		case 7:
+		case 7:							 // 添加群
 			
 			break;
-		case 8:
+		case 8:							 //发送文件 
 			
 			break;
 		default:
@@ -464,6 +469,27 @@ int find_friends(void)
 		}
 	}	
 	return 0;
+}
+
+//查找好友列表
+void find_friend_list(void)
+{
+	AGREEMENT data;
+	memset(&data, 0, sizeof(data));
+	data.order = 7;
+	strcpy(data.information, "查找好友列表");
+	while(1)
+	{
+		//消息入队
+		if(false == enqueue(pSend_queue, data))
+		{
+			printf("消息入队失败!");
+			continue;
+		}
+		else {
+			break;
+		}
+	}
 }
 
 //单聊
@@ -587,14 +613,15 @@ int _register(int sockfd)
 	strcpy(data.age, input_data.age);
 	strcpy(data.sex, input_data.sex);
 	strcpy(data.information, "请求注册");
-/*
-	printf("=========注册返回信息:==========\n");
-	printf("nickname:%s, mine_id: %s\n",
-		    data.nickname, data.mine_id);
-	printf("age:%s, sex: %s\n",
-		    data.age, data.sex);
-	printf("=================================\n");
-*/
+
+	printf("============_register===========\n");
+	printf("mine_id:", data.mine_id);
+	printf("nickname:", data.nickname);
+	printf("password:", data.password);
+	printf("age:", data.age);
+	printf("sex:", data.sex);
+	printf("============_register===========\n");
+	
 	while(1)
 	{
 		//消息入队
@@ -623,7 +650,6 @@ int log_in(int sockfd)
 	
 	login_func( &input_data);
 
-
 	data.order = 2;
 	strcpy(data.mine_id, input_data.id);
 	strcpy(data.password, input_data.password);
@@ -643,20 +669,6 @@ int log_in(int sockfd)
 			break;
 		}
 	}
-
-/*
-	while((-1 == (cnt = send(sockfd, (void*)&data, sizeof(data), 0))) 
-			   && (EINTR == errno));
-	if(-1 == cnt)
-	{
-		perror("发送请求登陆失败!");
-		return -1;
-	}
-	else if(cnt > 0)
-	{
-		printf("成功发送请求 %d 消息\n", data.order);
-	}
-*/
 	
 	return 0;
 }
