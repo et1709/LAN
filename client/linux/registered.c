@@ -10,7 +10,7 @@ int get_integer(void)
 		
 	while(scanf("%d", &num) < 0)
 	{
-		printf("Input error, Please enter an integer!\n");
+		//printf("Input error, Please enter an integer!\n");
 		while((ch = getchar() != '\n') && (ch != EOF));			
 	}
 	while((ch = getchar() != '\n') && (ch != EOF));
@@ -70,7 +70,7 @@ void get_size_string(char *buf, int size)
 		}
 		if(0 != len)
 		{
-			printf("The number of input characters is not enough. Please re-enter!\n");
+			//printf("The number of input characters is not enough. Please re-enter!\n");
 			memset(buf, 0, sizeof(char) * size);
 			len = size;
 			i = 0;
@@ -90,7 +90,7 @@ void get_size_string(char *buf, int size)
 char get_char(void)
 {
 	char ch, temp;
-	printf("Please enter one characters: ");
+	//printf("Please enter one characters: ");
 	while(ch = getchar())
 	{
 		if('\n' == ch)

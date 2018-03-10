@@ -5,6 +5,7 @@ INFORMATION_QUEUE* receive_queue;
 
 extern int udp_socket;
 int LoginFlag = 0;
+int RegisterFlag = 0;
 char my_account[6];
 
 
@@ -38,6 +39,13 @@ void function(int sockfd)
 		log_in_menu(sockfd);
 		//usleep(300000);
 
+		if(RegisterFlag)
+		{
+			RegisterFlag = 0;
+			usleep(300000);
+			continue;
+		}
+
 		// 加互斥锁	
 		pthread_mutex_lock(&LoginMutex);
 		while(0 == LoginFlag)
@@ -48,8 +56,7 @@ void function(int sockfd)
 		//printf("LoginFlag = %d\n", LoginFlag);
 		break;
 	}
-	find_friend_list();
-	usleep(300000);
+	
 	while(1)
 	{		
 		//进入主菜单
@@ -119,7 +126,7 @@ void * handler_receive(void *pSockfd)
 					//receive_data.order = -1;
 					break;
 				case 33:
-					printf("   收到%s(%s)发来的消息: %s\n",
+					printf("   收到(%s)(%s)发来的消息: %s\n",
 						  	receive_data.friend_nickname, receive_data.friend_id,
 						  	receive_data.information);
 					//receive_data.order = -1;
@@ -365,7 +372,7 @@ bool dequeue(INFORMATION_QUEUE *pQueue, AGREEMENT *pData)
 /*功能选择
 * 1:单聊        2:群聊       3:查找好友
 * 4:添加好友    5:查找群     6:创建群  
-* 7:添加群      8:发送文件   9:查找好友列表   0:退出
+* 7:添加群      8:发送文件   9:查看好友列表   0:退出
 */
 int choose_function(void)
 {
@@ -374,7 +381,7 @@ int choose_function(void)
 	while(1)
 	{		
 		num = get_integer();
-		if(num > 8 || num < 0)
+		if(num > 10 || num < 0)
 		{
 			printf("Sorry, without this option, please retype!\n");
 			continue;
@@ -456,7 +463,7 @@ int find_friends(void)
 	printf("请输入您好友的账号(5位数):\n");
 	get_size_string(data.friend_id, 5);
 	
-	strcpy(data.information, "查找好友");
+	strcpy(data.information, "查看好友信息");
 	strcpy(data.mine_id, my_account);
 	
 	while(1)
@@ -480,7 +487,7 @@ void find_friend_list(void)
 	AGREEMENT data;
 	memset(&data, 0, sizeof(data));
 	data.order = 7;
-	strcpy(data.information, "查找好友列表");
+	strcpy(data.information, "查看好友列表");
 	while(1)
 	{
 		//消息入队
@@ -499,40 +506,64 @@ void find_friend_list(void)
 int single_chat(void)
 {
 	AGREEMENT data;
-	int cnt, i, flag;
+	int cnt, flag;
 	char ch;
+	char temp_buf[6] = "";
+	int buflen = 0;
 	printf("进入单聊模式...\n");
+	find_friend_list();
+	usleep(300000);
 	while(1)
-	{			
-		flag = 0;
-		memset(&data, 0, sizeof(data));
-		data.order = 3;
-
-		printf("请问你要跟哪位好友(好友ID)聊天? (按0退出单聊)\n");
-		get_string(data.friend_id, 5);
-		if('0' == data.friend_id[0])
+	{		
+		printf("(按 0 退出单聊模式, 按 1~9 任意数继续聊天模式)\n");
+		cnt = get_integer();
+		if(0 == cnt)
 		{
 			break;
 		}
-		printf("friend_id = %s\n", data.friend_id);
-		
-		
-		printf("你要发送的消息内容(50字以内):\n");
-		get_string(data.information, 100);
-		
-
+		flag = 0;
+		memset(&data, 0, sizeof(data));
+		data.order = 3;
 		while(1)
-		{
-			//消息入队
-			if(false == enqueue(pSend_queue, data))
+		{			
+			if(0 == buflen)
 			{
-				printf("消息入队失败!");
-				continue;
+				printf("   请问你要跟哪位好友(好友ID)聊天? (按0退出与当前好友的聊天)\n");
+				get_string(temp_buf, 5);
+				if('0' == temp_buf[0])
+				{
+					memset(temp_buf, 0, sizeof(temp_buf));
+					buflen = 0;
+					break;
+				}
+				buflen = sizeof(temp_buf);
+				strcpy(data.friend_id, temp_buf);
+				printf("friend_id = %s\n", data.friend_id);
 			}
-			else {
+			
+			printf("   请输入你要发送的消息内容(50字以内):\n");
+			printf("   (按 0 退出与好友 %s 的聊天)\n", temp_buf);
+			get_string(data.information, 100);
+			if('0' == data.information[0])
+			{
+				memset(temp_buf, 0, sizeof(temp_buf));
+				buflen = 0;
 				break;
-			}
-		}
+			}		
+			while(1)
+			{
+				//消息入队
+				if(false == enqueue(pSend_queue, data))
+				{
+					printf("消息入队失败!");
+					continue;
+				}
+				else {
+					memset(data.information, '\0', sizeof(data.information));
+					break;
+				}
+			}		
+		}		
 	}
 }
 
@@ -598,6 +629,7 @@ int _register(int sockfd)
 			continue;
 		}
 		else {
+			RegisterFlag = 1;
 			break;
 		}
 	}

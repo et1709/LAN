@@ -14,7 +14,7 @@ int main(void)
 		return -1;
 	}
 	
-	//3, 功能选择
+	//2, 功能选择
 	function(tcp_sockfd);
 	
 }
