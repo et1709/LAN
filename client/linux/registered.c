@@ -120,7 +120,7 @@ int register_func(struct information *info)
 	
 
 	// 3: 创建昵称	
-	printf("请输入需要创建的呢称(10位以内英文字母):\n");
+	printf("请输入需要创建的呢称:\n");
 	get_string(info->nickname, 5);
 
 
@@ -130,8 +130,13 @@ int register_func(struct information *info)
 	{
 		flag = 0;
 		get_string(info->age, 3);
+		printf("info->age = %s\n", info->age);
 		for(i = 0; i < 3; i++)
 		{
+			if('\0' == info->age[i])
+			{
+				break;
+			}
 			if(info->age[i] < '0' || info->age[i] > '9')
 			{
 				printf("info->age[%d] = %c\n", i, info->age[i]);
