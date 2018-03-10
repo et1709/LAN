@@ -16,7 +16,6 @@ int udp_server_init(int index)
 	socklen_t cltlen = sizeof(struct sockaddr_in);
 	char buf_r[128] = "";				//创建读缓存区
 	char buf_w[128] = "Hello client";	//创建写缓存区
-	int on = 1;
 	
 	udp_socket = uin_open_udp(port);	//建立一个socket通信
 	if(udp_socket == -1)
@@ -42,25 +41,6 @@ int udp_server_init(int index)
 		uin_sendto(udp_socket, buf_w, strlen(buf_w), &udp_cltaddr);
 	}
 
-	//// 设置广播选项
-	//if (-1 == setsockopt(udp_socket, SOL_SOCKET, SO_BROADCAST, 
-	//				&on, sizeof on))
-	//{
-	//	perror("设置广播失败");
-	//	close(udp_socket);
-	//}
-
-	////判断消息后应答
-	//if(strcmp(buf_r, "Hello server") == 0)
-	//{
-	//	//将新上线的客户发送给在线的客户端
-	//	memset(buf_w, 0 ,sizeof buf_w);//清空缓冲区
-	//	sprintf(buf_w, "%s(%d)", inet_ntoa(infos[index].tcp_cltaddr.sin_addr)
-	//								,ntohs(infos[index].tcp_cltaddr.sin_port));
-	//	strcat(buf_w, " 已上线...\n");
-	//	uin_sendto(udp_socket, buf_w, strlen(buf_w), &(infos[index].tcp_cltaddr));
-	//}
-	
 	//关闭套接字
 	while((close(udp_socket)&&(errno = EINTR) == -1));
 	

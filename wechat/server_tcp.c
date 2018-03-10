@@ -8,7 +8,7 @@
 |	输出  ：-1——失败； 0——成功
 |	说明  ：
 -------------------------------------------------------*/
-int tcp_server_init(struct TcpInit *tcp_init)
+int tcp_server_init(TCP_INIT *tcp_init)
 {
 	tcp_init->port = SOCKET_PORT;
 	
@@ -34,7 +34,7 @@ void *tcp_server_handle(void *arg)
 	char *cltip = NULL;				//建立客户端端 IP
 	in_port_t cltport;				//建立客户端端口号
 	char buf_r[128] = "";
-	char buf_w[128] = "Hello client";
+	char buf_w[128] = SECRET_KEY;
 	int connect_status;
 	int index = (int)arg;
 	int connfd = infos[index].tcp_connfd;
@@ -92,7 +92,6 @@ void *tcp_server_handle(void *arg)
 			//接收客户端发送过来的数据包
 			if((read_len = r_recv(connfd, (void *)packet, sizeof (AGREEMENT))) > 0)
 			{
-				//cliInfos[cliNum].tcp_cltaddr = infos[index].tcp_cltaddr; //IP地址写入客户缓存区
 				printf("接收到（%s）的消息：%d %s %s\n", inet_ntoa(infos[index].tcp_cltaddr.sin_addr), 
 					packet->order, packet->information, packet->mine_id);
 
