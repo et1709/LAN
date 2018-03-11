@@ -7,6 +7,8 @@ int main(void)
 	char *bcast_ip = BCAST;
 	unsigned short bcast_port = SVR_PORT;
 	int tcp_sockfd;
+
+
 	
     //1,连接服务器    
 	if(-1 == (tcp_sockfd = connect_server(bcast_ip, bcast_port)))
@@ -18,6 +20,7 @@ int main(void)
 	function(tcp_sockfd);
 	
 }
+
 
 
 
