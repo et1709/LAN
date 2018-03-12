@@ -86,3 +86,11 @@ _out:
  
 	return 0;
 }
+
+
+
+QqList_Phead = Init_Kernel_List1();
+
+
+
+
