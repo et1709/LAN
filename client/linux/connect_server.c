@@ -33,9 +33,8 @@ int connect_server(char *ip, unsigned short port)
 void sig_callback(int sig)
 {
 	printf("服务器丢失!\n");
-	//serverLoseFlag = 1;
+	close(global_tcp_sockfd);
 }
-
 
 //用TCP连接服务器,成功返回连接描述符，失败返回-1
 int tcp_connect(struct sockaddr_in* pSvr_addr)
@@ -50,7 +49,7 @@ int tcp_connect(struct sockaddr_in* pSvr_addr)
 	if(SIG_ERR == signal(SIGPIPE, sig_callback))
 	{
 		perror("注册 SIGPIPE 信号失败!");
-		return ;
+		return -1;
 	}
 	
 	// 1. 创建TCP套接字

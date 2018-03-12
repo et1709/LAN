@@ -71,10 +71,6 @@ void find_friend_list(void);        //查找好友列表
 
 
 
-
-
-
-
 #endif
 
 
